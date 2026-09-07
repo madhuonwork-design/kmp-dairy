@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KMP Dairy Farms — FarmOS</title>
+<style>
+:root{
+  --bg:#07111b;--panel:#0d1b29;--panel2:#102235;--line:#1e3548;
+  --text:#e9f4fb;--muted:#8ca6b8;--accent:#42e8a4;--accent2:#38bdf8;
+  --warn:#f6c453;--danger:#ff6577;--shadow:0 18px 50px rgba(0,0,0,.28)
+}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 20% 0%,#12334a 0,#07111b 38%,#050b12 100%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit} button{cursor:pointer}
+.app{display:flex;min-height:100vh}.sidebar{width:255px;background:rgba(5,14,23,.92);border-right:1px solid var(--line);padding:20px 14px;position:fixed;inset:0 auto 0 0;z-index:20;backdrop-filter:blur(16px)}
+.brand{display:flex;gap:12px;align-items:center;padding:5px 8px 25px}.brand-icon{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#041018;font-size:23px;font-weight:900;box-shadow:0 0 25px #42e8a433}.brand b{display:block;font-size:15px;letter-spacing:1px}.brand span{font-size:10px;color:var(--muted);letter-spacing:2px}
+.nav button{width:100%;border:0;background:transparent;color:var(--muted);padding:12px 13px;border-radius:11px;text-align:left;margin:2px 0;display:flex;gap:12px;align-items:center}.nav button:hover,.nav button.active{background:linear-gradient(90deg,#173149,#102333);color:var(--text)}.nav button.active{box-shadow:inset 3px 0 var(--accent)}
+.main{margin-left:255px;width:calc(100% - 255px);padding:22px 28px}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:22px}.title h1{margin:0;font-size:27px}.title p{margin:5px 0;color:var(--muted);font-size:13px}.top-actions{display:flex;gap:9px;align-items:center}.btn{border:1px solid var(--line);background:#102233;color:var(--text);padding:10px 14px;border-radius:10px}.btn:hover{border-color:#39617b}.btn.primary{background:linear-gradient(135deg,#42e8a4,#38bdf8);color:#041018;border:0;font-weight:800}.btn.danger{color:#ff8d9b}.icon-btn{width:42px;height:42px;padding:0}
+.page{display:none}.page.active{display:block}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card,.panel{background:linear-gradient(145deg,rgba(15,34,51,.96),rgba(8,22,34,.96));border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow)}.card{padding:18px}.card .label{color:var(--muted);font-size:12px}.card .value{font-size:27px;font-weight:800;margin-top:8px}.trend{font-size:11px;margin-top:7px;color:var(--accent)}.panel{padding:18px;margin-top:15px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}.panel-head h2{font-size:16px;margin:0}.muted{color:var(--muted)}.grid2{display:grid;grid-template-columns:1.35fr .85fr;gap:15px}.chart{height:270px;display:flex;align-items:end;gap:9px;padding:20px 5px 5px}.bar{flex:1;min-width:7px;border-radius:7px 7px 2px 2px;background:linear-gradient(#42e8a4,#168bb8);position:relative}.bar span{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted)}
+.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid #183044}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.7px}tr:hover td{background:#102333}.status{display:inline-flex;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:700}.green{background:#42e8a41c;color:var(--accent)}.yellow{background:#f6c4531c;color:var(--warn)}.red{background:#ff65771c;color:var(--danger)}.blue{background:#38bdf81c;color:var(--accent2)}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}.search{flex:1;min-width:220px}.field,input,select,textarea{background:#081723;border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px 11px;outline:none}.field:focus,input:focus,select:focus,textarea:focus{border-color:#3e7595}textarea{min-height:90px;resize:vertical}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.formgrid .full{grid-column:1/-1}.field label{display:block;color:var(--muted);font-size:11px;margin-bottom:6px}.field{border:0;background:transparent;padding:0}.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal.show{display:flex}.modal-box{width:min(720px,100%);max-height:90vh;overflow:auto;background:#0b1b2a;border:1px solid #29465c;border-radius:18px;box-shadow:0 30px 100px #000b;padding:20px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-head h2{margin:0;font-size:19px}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.empty{text-align:center;padding:35px;color:var(--muted)}.metric-list{display:grid;gap:12px}.metric{display:flex;justify-content:space-between;padding:12px;background:#091925;border-radius:10px}.notice{padding:12px;border-left:3px solid var(--warn);background:#f6c4530d;margin:8px 0;border-radius:8px;font-size:12px}.profile{display:grid;grid-template-columns:220px 1fr;gap:18px}.cow-avatar{height:210px;border-radius:15px;background:radial-gradient(circle,#19445c,#0a1825);display:grid;place-items:center;font-size:70px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.mini{background:#091925;border:1px solid #183044;padding:13px;border-radius:11px}.mini small{color:var(--muted)}.mini b{display:block;font-size:20px;margin-top:4px}.toast{position:fixed;right:20px;bottom:20px;background:#102a3b;border:1px solid #31536a;padding:12px 15px;border-radius:11px;box-shadow:var(--shadow);display:none;z-index:100}.toast.show{display:block}.hamb{display:none}
+@media(max-width:1050px){.cards{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.sidebar{transform:translateX(-100%);transition:.25s}.sidebar.open{transform:none}.main{margin-left:0;width:100%;padding:17px}.hamb{display:block}.cards{grid-template-columns:1fr 1fr}.formgrid,.profile{grid-template-columns:1fr}.top{align-items:flex-start}.top-actions .hide-mobile{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="brand-icon">🐄</div><div><b>KMP DAIRY</b><span>FARMOS</span></div></div>
+  <nav class="nav">
+    <button class="active" data-page="dashboard">◈ Dashboard</button>
+    <button data-page="cows">🐄 Cow Management</button>
+    <button data-page="milk">◉ Milk Production</button>
+    <button data-page="health">♥ Health & Vaccination</button>
+    <button data-page="breeding">♧ Breeding & Calving</button>
+    <button data-page="finance">₹ Finance</button>
+    <button data-page="inventory">▣ Feed & Inventory</button>
+    <button data-page="reports">▤ Reports</button>
+    <button data-page="backup">↥ Backup & Restore</button>
+    <button data-page="settings">⚙ Settings</button>
+  </nav>
+</aside>
+<main class="main">
+<header class="top"><div class="title"><button class="btn icon-btn hamb" onclick="toggleSide()">☰</button><h1 id="pageTitle">Farm Command Center</h1><p id="pageSub">Real-time dairy operations overview</p></div><div class="top-actions"><button class="btn hide-mobile" onclick="openCow()">＋ Add Cow</button><button class="btn primary" onclick="quickBackup()">↥ Backup</button></div></header>
+
+<section id="dashboard" class="page active">
+  <div class="cards" id="dashCards"></div>
+  <div class="grid2">
+    <div class="panel"><div class="panel-head"><h2>Milk Production — Last 14 Days</h2><span class="muted">Litres</span></div><div class="chart" id="milkChart"></div></div>
+    <div class="panel"><div class="panel-head"><h2>Farm Health</h2></div><div class="metric-list" id="healthSummary"></div></div>
+  </div>
+  <div class="panel"><div class="panel-head"><h2>Priority Alerts</h2><button class="btn" onclick="showPage('health')">View Health</button></div><div id="alerts"></div></div>
+</section>
+
+<section id="cows" class="page">
+  <div class="panel"><div class="panel-head"><h2>Animal Registry</h2><button class="btn primary" onclick="openCow()">＋ Register Cow</button></div>
+  <div class="toolbar"><input class="search" id="cowSearch" placeholder="Search ID, tag, name or breed..." oninput="renderCows()"><select id="cowStatus" onchange="renderCows()"><option value="">All Status</option><option>Lactating</option><option>Pregnant</option><option>Dry</option><option>Calf</option><option>Active</option><option>Sold</option></select></div>
+  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Breed</th><th>DOB</th><th>Status</th><th>Milk/day</th><th>Actions</th></tr></thead><tbody id="cowTable"></tbody></table></div></div>
+</section>
+
+<section id="milk" class="page">
+ <div class="panel"><div class="panel-head"><h2>Milk Production</h2><button class="btn primary" onclick="openMilk()">＋ Record Milk</button></div>
+ <div class="toolbar"><input class="search" id="milkSearch" placeholder="Search cow..." oninput="renderMilk()"><input type="date" id="milkDate" onchange="renderMilk()"></div>
+ <div class="table-wrap"><table><thead><tr><th>Date</th><th>Cow</th><th>Morning</th><th>Afternoon</th><th>Evening</th><th>Total</th><th>Actions</th></tr></thead><tbody id="milkTable"></tbody></table></div></div>
+</section>
+
+<section id="health" class="page">
+ <div class="panel"><div class="panel-head"><h2>Health & Vaccination</h2><button class="btn primary" onclick="openHealth()">＋ Health Record</button></div>
+ <div class="table-wrap"><table><thead><tr><th>Date</th><th>Cow</th><th>Type</th><th>Details</th><th>Next Due</th><th>Cost</th><th>Actions</th></tr></thead><tbody id="healthTable"></tbody></table></div></div>
+</section>
+
+<section id="breeding" class="page">
+ <div class="panel"><div class="panel-head"><h2>Breeding & Calving</h2><button class="btn primary" onclick="openBreeding()">＋ Breeding Record</button></div>
+ <div class="table-wrap"><table><thead><tr><th>Date</th><th>Cow</th><th>Event</th><th>Expected Calving</th><th>Result</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="breedingTable"></tbody></table></div></div>
+</section>
+
+<section id="finance" class="page">
+ <div class="cards" id="financeCards"></div>
+ <div class="panel"><div class="panel-head"><h2>Income & Expenses</h2><button class="btn primary" onclick="openFinance()">＋ Add Transaction</button></div>
+ <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Category</th><th>Description</th><th>Amount</th><th>Actions</th></tr></thead><tbody id="financeTable"></tbody></table></div></div>
+</section>
+
+<section id="inventory" class="page">
+ <div class="panel"><div class="panel-head"><h2>Feed & Inventory</h2><button class="btn primary" onclick="openInventory()">＋ Add Item</button></div>
+ <div class="table-wrap"><table><thead><tr><th>Item</th><th>Category</th><th>Stock</th><th>Unit</th><th>Min Stock</th><th>Cost</th><th>Actions</th></tr></thead><tbody id="inventoryTable"></tbody></table></div></div>
+</section>
+
+<section id="reports" class="page">
+ <div class="panel"><div class="panel-head"><h2>Report Center</h2></div>
+ <div class="cards">
+  <button class="card" onclick="reportCows()"><span class="label">REPORT</span><div class="value">🐄 Cow Register</div><div class="trend">Generate printable report</div></button>
+  <button class="card" onclick="reportMilk()"><span class="label">REPORT</span><div class="value">◉ Milk Production</div><div class="trend">Daily production summary</div></button>
+  <button class="card" onclick="reportFinance()"><span class="label">REPORT</span><div class="value">₹ Finance</div><div class="trend">Income & expense summary</div></button>
+  <button class="card" onclick="reportHealth()"><span class="label">REPORT</span><div class="value">♥ Health</div><div class="trend">Medical & vaccination</div></button>
+ </div></div>
+</section>
+
+<section id="backup" class="page">
+ <div class="panel"><div class="panel-head"><h2>Data Protection Center</h2></div>
+ <div class="notice">Your farm data is stored in shared cloud storage — everyone who opens this app sees and edits the same records in real time. Still, create regular JSON backups and keep copies on an external drive or trusted cloud storage as a safety net.</div>
+ <div class="toolbar"><button class="btn primary" onclick="quickBackup()">↥ Export Complete Backup</button><label class="btn">↧ Restore Backup <input type="file" id="restoreFile" accept=".json" hidden onchange="restoreBackup(this.files[0])"></label><button class="btn" onclick="exportCSV()">⇩ Export Cows CSV</button></div>
+ <div class="metric-list"><div class="metric"><span>Database status</span><b class="green">● Synced</b></div><div class="metric"><span>Storage engine</span><b>Shared cloud storage</b></div><div class="metric"><span>Last backup</span><b id="lastBackup">Never</b></div></div></div>
+</section>
+
+<section id="settings" class="page">
+ <div class="panel"><div class="panel-head"><h2>Farm Settings</h2></div>
+ <div class="formgrid"><div class="field"><label>Farm Name</label><input id="setFarm"></div><div class="field"><label>Owner</label><input id="setOwner"></div><div class="field"><label>Location</label><input id="setLocation"></div><div class="field"><label>Currency</label><select id="setCurrency"><option>INR ₹</option><option>USD $</option><option>EUR €</option></select></div></div>
+ <div class="actions"><button class="btn primary" onclick="saveSettings()">Save Settings</button></div></div>
+</section>
+</main></div>
+
+<div class="modal" id="modal"><div class="modal-box"><div class="modal-head"><h2 id="modalTitle">Form</h2><button class="btn icon-btn" onclick="closeModal()">×</button></div><div id="modalBody"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY='kmp_dairy_farm_data';
+let data={cows:[],milk:[],health:[],breeding:[],finance:[],inventory:[],settings:{farm:'KMP Dairy Farms',owner:'',location:'',currency:'INR ₹'}};
+
+const $=id=>document.getElementById(id);
+function uid(p='id'){return p+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
+function today(){return new Date().toISOString().slice(0,10)}
+function money(n){return (data.settings.currency||'INR ₹').includes('INR')?'₹ '+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2}):Number(n||0).toLocaleString()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2500)}
+function toggleSide(){$('sidebar').classList.toggle('open')}
+
+async function openDB(){
+ try{
+  const r=await window.storage.get(STORAGE_KEY,true);
+  if(r&&r.value){const parsed=JSON.parse(r.value);data={...data,...parsed,settings:{...data.settings,...(parsed.settings||{})}}}
+ }catch(e){ /* nothing saved yet — start fresh */ }
+ $('setFarm').value=data.settings.farm;$('setOwner').value=data.settings.owner;$('setLocation').value=data.settings.location;$('setCurrency').value=data.settings.currency;
+ renderAll()
+}
+async function persist(){
+ try{const r=await window.storage.set(STORAGE_KEY,JSON.stringify(data),true);if(!r)toast('Could not sync — check connection')}
+ catch(e){toast('Sync failed — your change may not be visible to others')}
+}
+async function loadAll(){await openDB()}
+async function save(store,obj){obj.updatedAt=new Date().toISOString();const arr=data[store];const i=arr.findIndex(x=>x.id===obj.id);if(i<0)arr.push(obj);else arr[i]=obj;await persist();renderAll()}
+async function remove(store,id){if(!confirm('Delete this record? This action cannot be undone and affects everyone using this app.'))return;data[store]=data[store].filter(x=>x.id!==id);await persist();renderAll();toast('Record deleted')}
+
+function showPage(id){
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));
+ const titles={dashboard:['Farm Command Center','Real-time dairy operations overview'],cows:['Animal Registry','Complete livestock database'],milk:['Milk Production','Daily and historical production'],health:['Health & Vaccination','Animal health monitoring'],breeding:['Breeding & Calving','Reproductive management'],finance:['Finance','Income, expenses and profitability'],inventory:['Feed & Inventory','Stock and consumables'],reports:['Report Center','Generate printable farm reports'],backup:['Data Protection Center','Backup, restore and data portability'],settings:['Farm Settings','Configure your farm']};
+ $('pageTitle').textContent=titles[id][0];$('pageSub').textContent=titles[id][1];$('sidebar').classList.remove('open');
+ if(id==='dashboard')renderDashboard()
+}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
+
+function renderAll(){renderDashboard();renderCows();renderMilk();renderHealth();renderBreeding();renderFinance();renderInventory()}
+function renderDashboard(){
+ const cows=data.cows.filter(c=>c.status!=='Sold'&&c.status!=='Deceased'), lact=cows.filter(c=>c.status==='Lactating').length, preg=cows.filter(c=>c.status==='Pregnant').length;
+ const day=today(), milkToday=data.milk.filter(x=>x.date===day).reduce((a,x)=>a+Number(x.total||0),0);
+ const inc=data.finance.filter(x=>x.type==='Income').reduce((a,x)=>a+Number(x.amount||0),0), exp=data.finance.filter(x=>x.type==='Expense').reduce((a,x)=>a+Number(x.amount||0),0);
+ $('dashCards').innerHTML=[
+  ['TOTAL HERD',cows.length,'Active animals'],['LACTATING',lact,'Milk producing'],['PREGNANT',preg,'Breeding pipeline'],['TODAY’S MILK',milkToday.toFixed(1)+' L','Recorded production'],
+  ['INCOME',money(inc),'All recorded income'],['EXPENSES',money(exp),'All recorded expenses'],['NET BALANCE',money(inc-exp),inc-exp>=0?'Positive balance':'Review expenses'],['ATTENTION',attentionCount(),'Health / due alerts']
+ ].map((x,i)=>`<div class="card"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="trend">${x[2]}</div></div>`).join('');
+ const days=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().slice(0,10);const v=data.milk.filter(x=>x.date===ds).reduce((a,x)=>a+Number(x.total||0),0);days.push({d:ds.slice(5),v})}
+ const max=Math.max(1,...days.map(x=>x.v));$('milkChart').innerHTML=days.map(x=>`<div class="bar" style="height:${Math.max(5,x.v/max*85)}%"><span>${x.d}</span></div>`).join('');
+ $('healthSummary').innerHTML=`<div class="metric"><span>Vaccination records</span><b>${data.health.filter(x=>x.type==='Vaccination').length}</b></div><div class="metric"><span>Health cases</span><b>${data.health.filter(x=>x.type!=='Vaccination').length}</b></div><div class="metric"><span>Breeding events</span><b>${data.breeding.length}</b></div><div class="metric"><span>Inventory items</span><b>${data.inventory.length}</b></div>`;
+ const due=data.health.filter(x=>x.nextDue&&x.nextDue<=new Date(Date.now()+7*864e5).toISOString().slice(0,10));
+ $('alerts').innerHTML=due.length?due.slice(0,8).map(x=>`<div class="notice">⚠ <b>${esc(cowName(x.cowId))}</b> — ${esc(x.type)} due ${esc(x.nextDue)}</div>`).join(''):'<div class="empty">✓ No priority alerts for the next 7 days.</div>';
+}
+function attentionCount(){const d=new Date(Date.now()+7*864e5).toISOString().slice(0,10);return data.health.filter(x=>x.nextDue&&x.nextDue<=d).length}
+function cowName(id){const c=data.cows.find(x=>x.id===id);return c?`${c.name||c.id} (${c.tag||c.id})`:'Unknown'}
+
+function renderCows(){
+ const q=($('cowSearch')?.value||'').toLowerCase(), st=$('cowStatus')?.value||'';
+ const arr=data.cows.filter(c=>(!q||[c.id,c.tag,c.name,c.breed].join(' ').toLowerCase().includes(q))&&(!st||c.status===st));
+ $('cowTable').innerHTML=arr.length?arr.map(c=>`<tr><td><b>${esc(c.id)}</b></td><td>${esc(c.name||'—')}</td><td>${esc(c.breed||'—')}</td><td>${esc(c.dob||'—')}</td><td><span class="status ${c.status==='Lactating'?'green':c.status==='Pregnant'?'blue':c.status==='Sold'?'red':'yellow'}">${esc(c.status||'Active')}</span></td><td>${milkForCow(c.id).toFixed(1)} L</td><td><button class="btn" onclick="openCow('${c.id}')">Edit</button> <button class="btn danger" onclick="remove('cows','${c.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No cows found. Register your first animal.</td></tr>';
+}
+function milkForCow(id){const a=data.milk.filter(x=>x.cowId===id&&x.date===today());return a.reduce((s,x)=>s+Number(x.total||0),0)}
+
+function renderMilk(){
+ const q=($('milkSearch')?.value||'').toLowerCase(), d=$('milkDate')?.value||'';
+ let arr=data.milk.filter(x=>(!d||x.date===d)&&(!q||cowName(x.cowId).toLowerCase().includes(q)));
+ arr=[...arr].sort((a,b)=>b.date.localeCompare(a.date));
+ $('milkTable').innerHTML=arr.length?arr.map(x=>`<tr><td>${x.date}</td><td>${esc(cowName(x.cowId))}</td><td>${x.morning}</td><td>${x.afternoon}</td><td>${x.evening}</td><td><b>${Number(x.total).toFixed(1)} L</b></td><td><button class="btn" onclick="openMilk('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('milk','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No milk records.</td></tr>';
+}
+
+function renderHealth(){
+ const arr=[...data.health].sort((a,b)=>b.date.localeCompare(a.date));
+ $('healthTable').innerHTML=arr.length?arr.map(x=>`<tr><td>${x.date}</td><td>${esc(cowName(x.cowId))}</td><td><span class="status ${x.type==='Vaccination'?'green':'yellow'}">${esc(x.type)}</span></td><td>${esc(x.details||x.vaccine||'—')}</td><td>${esc(x.nextDue||'—')}</td><td>${money(x.cost)}</td><td><button class="btn" onclick="openHealth('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('health','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No health records.</td></tr>';
+}
+function renderBreeding(){
+ $('breedingTable').innerHTML=data.breeding.length?[...data.breeding].sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${x.date}</td><td>${esc(cowName(x.cowId))}</td><td>${esc(x.event)}</td><td>${esc(x.calving||'—')}</td><td>${esc(x.result||'—')}</td><td>${esc(x.notes||'—')}</td><td><button class="btn" onclick="openBreeding('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('breeding','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No breeding records.</td></tr>';
+}
+function renderFinance(){
+ const inc=data.finance.filter(x=>x.type==='Income').reduce((s,x)=>s+Number(x.amount),0),exp=data.finance.filter(x=>x.type==='Expense').reduce((s,x)=>s+Number(x.amount),0);
+ $('financeCards').innerHTML=[['TOTAL INCOME',money(inc)],['TOTAL EXPENSE',money(exp)],['NET BALANCE',money(inc-exp)],['TRANSACTIONS',data.finance.length]].map(x=>`<div class="card"><div class="label">${x[0]}</div><div class="value">${x[1]}</div></div>`).join('');
+ $('financeTable').innerHTML=[...data.finance].sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${x.date}</td><td><span class="status ${x.type==='Income'?'green':'red'}">${x.type}</span></td><td>${esc(x.category)}</td><td>${esc(x.description||'')}</td><td>${money(x.amount)}</td><td><button class="btn" onclick="openFinance('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('finance','${x.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">No transactions.</td></tr>';
+}
+function renderInventory(){
+ $('inventoryTable').innerHTML=data.inventory.length?data.inventory.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.category)}</td><td class="${Number(x.stock)<=Number(x.minStock)?'red':''}">${x.stock}</td><td>${esc(x.unit)}</td><td>${x.minStock}</td><td>${money(x.cost)}</td><td><button class="btn" onclick="openInventory('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('inventory','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No inventory items.</td></tr>';
+}
+
+function cowOptions(selected=''){return '<option value="">Select cow</option>'+data.cows.map(c=>`<option value="${c.id}" ${c.id===selected?'selected':''}>${esc(c.name||c.id)} — ${esc(c.tag||c.id)}</option>`).join('')}
+function modal(title,body){$('modalTitle').textContent=title;$('modalBody').innerHTML=body;$('modal').classList.add('show')}
+function closeModal(){$('modal').classList.remove('show')}
+window.onclick=e=>{if(e.target===$('modal'))closeModal()}
+
+function openCow(id=''){
+ const c=data.cows.find(x=>x.id===id)||{id:'',name:'',tag:'',rfid:'',breed:'HF Cross',dob:'',status:'Lactating',weight:'',purchaseDate:'',purchaseCost:'',notes:''};
+ modal(id?'Edit Cow':'Register New Cow',`<div class="formgrid">
+ <div class="field"><label>Cow ID *</label><input id="f_id" value="${esc(c.id)}" ${id?'readonly':''}></div>
+ <div class="field"><label>Tag Number</label><input id="f_tag" value="${esc(c.tag)}"></div>
+ <div class="field"><label>Name / Nickname</label><input id="f_name" value="${esc(c.name)}"></div>
+ <div class="field"><label>RFID Number</label><input id="f_rfid" value="${esc(c.rfid)}"></div>
+ <div class="field"><label>Breed</label><input id="f_breed" value="${esc(c.breed)}"></div>
+ <div class="field"><label>Date of Birth</label><input type="date" id="f_dob" value="${esc(c.dob)}"></div>
+ <div class="field"><label>Status</label><select id="f_status">${['Active','Lactating','Pregnant','Dry','Calf','Sold','Deceased'].map(s=>`<option ${c.status===s?'selected':''}>${s}</option>`).join('')}</select></div>
+ <div class="field"><label>Weight (kg)</label><input type="number" id="f_weight" value="${esc(c.weight)}"></div>
+ <div class="field"><label>Purchase Date</label><input type="date" id="f_purchaseDate" value="${esc(c.purchaseDate)}"></div>
+ <div class="field"><label>Purchase Cost</label><input type="number" id="f_purchaseCost" value="${esc(c.purchaseCost)}"></div>
+ <div class="field full"><label>Notes</label><textarea id="f_notes">${esc(c.notes)}</textarea></div></div>
+ <div class="actions"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveCow('${id}')">Save Cow</button></div>`)
+}
+async function saveCow(old){
+ const id=$('f_id').value.trim();if(!id)return toast('Cow ID is required');
+ const o={id,name:$('f_name').value.trim(),tag:$('f_tag').value.trim(),rfid:$('f_rfid').value.trim(),breed:$('f_breed').value.trim(),dob:$('f_dob').value,status:$('f_status').value,weight:Number($('f_weight').value||0),purchaseDate:$('f_purchaseDate').value,purchaseCost:Number($('f_purchaseCost').value||0),notes:$('f_notes').value,createdAt:old?(data.cows.find(x=>x.id===old)?.createdAt||new Date().toISOString()):new Date().toISOString()};
+ await save('cows',o);closeModal();toast('Cow saved successfully')
+}
+
+function openMilk(id=''){
+ const x=data.milk.find(a=>a.id===id)||{date:today(),cowId:'',morning:0,afternoon:0,evening:0};
+ modal(id?'Edit Milk Record':'Record Milk',`<div class="formgrid"><div class="field"><label>Date *</label><input type="date" id="m_date" value="${x.date}"></div><div class="field"><label>Cow *</label><select id="m_cow">${cowOptions(x.cowId)}</select></div><div class="field"><label>Morning (L)</label><input type="number" step=".1" id="m_m" value="${x.morning}"></div><div class="field"><label>Afternoon (L)</label><input type="number" step=".1" id="m_a" value="${x.afternoon}"></div><div class="field"><label>Evening (L)</label><input type="number" step=".1" id="m_e" value="${x.evening}"></div></div><div class="actions"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveMilk('${id}')">Save Record</button></div>`)
+}
+async function saveMilk(id){const o={id:id||uid('milk'),date:$('m_date').value,cowId:$('m_cow').value,morning:Number($('m_m').value||0),afternoon:Number($('m_a').value||0),evening:Number($('m_e').value||0)};o.total=o.morning+o.afternoon+o.evening;if(!o.cowId)return toast('Select a cow');await save('milk',o);closeModal();toast('Milk record saved')}
+
+function openHealth(id=''){
+ const x=data.health.find(a=>a.id===id)||{date:today(),cowId:'',type:'Vaccination',details:'',nextDue:'',cost:0};
+ modal(id?'Edit Health Record':'Health / Vaccination Record',`<div class="formgrid"><div class="field"><label>Date</label><input type="date" id="h_date" value="${x.date}"></div><div class="field"><label>Cow</label><select id="h_cow">${cowOptions(x.cowId)}</select></div><div class="field"><label>Type</label><select id="h_type"><option ${x.type==='Vaccination'?'selected':''}>Vaccination</option><option ${x.type==='Treatment'?'selected':''}>Treatment</option><option ${x.type==='Checkup'?'selected':''}>Checkup</option><option ${x.type==='Other'?'selected':''}>Other</option></select></div><div class="field"><label>Next Due</label><input type="date" id="h_due" value="${x.nextDue||''}"></div><div class="field"><label>Cost</label><input type="number" id="h_cost" value="${x.cost||0}"></div><div class="field full"><label>Details / Medicine / Vaccine</label><textarea id="h_details">${esc(x.details||'')}</textarea></div></div><div class="actions"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveHealth('${id}')">Save Record</button></div>`)
+}
+async function saveHealth(id){const o={id:id||uid('health'),date:$('h_date').value,cowId:$('h_cow').value,type:$('h_type').value,nextDue:$('h_due').value,cost:Number($('h_cost').value||0),details:$('h_details').value};if(!o.cowId)return toast('Select a cow');await save('health',o);closeModal();toast('Health record saved')}
+
+function openBreeding(id=''){
+ const x=data.breeding.find(a=>a.id===id)||{date:today(),cowId:'',event:'Heat',calving:'',result:'',notes:''};
+ modal(id?'Edit Breeding Record':'Breeding / Calving Record',`<div class="formgrid"><div class="field"><label>Date</label><input type="date" id="b_date" value="${x.date}"></div><div class="field"><label>Cow</label><select id="b_cow">${cowOptions(x.cowId)}</select></div><div class="field"><label>Event</label><select id="b_event">${['Heat','AI / Insemination','Pregnancy Check','Calving','Dry Off'].map(s=>`<option ${x.event===s?'selected':''}>${s}</option>`).join('')}</select></div><div class="field"><label>Expected Calving</label><input type="date" id="b_calving" value="${x.calving||''}"></div><div class="field"><label>Result</label><input id="b_result" value="${esc(x.result||'')}"></div><div class="field full"><label>Notes</label><textarea id="b_notes">${esc(x.notes||'')}</textarea></div></div><div class="actions"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveBreeding('${id}')">Save Record</button></div>`)
+}
+async function saveBreeding(id){const o={id:id||uid('breed'),date:$('b_date').value,cowId:$('b_cow').value,event:$('b_event').value,calving:$('b_calving').value,result:$('b_result').value,notes:$('b_notes').value};if(!o.cowId)return toast('Select a cow');await save('breeding',o);closeModal();toast('Breeding record saved')}
+
+function openFinance(id=''){
+ const x=data.finance.find(a=>a.id===id)||{date:today(),type:'Income',category:'Milk Sales',description:'',amount:0};
+ modal(id?'Edit Transaction':'Add Transaction',`<div class="formgrid"><div class="field"><label>Date</label><input type="date" id="p_date" value="${x.date}"></div><div class="field"><label>Type</label><select id="p_type"><option ${x.type==='Income'?'selected':''}>Income</option><option ${x.type==='Expense'?'selected':''}>Expense</option></select></div><div class="field"><label>Category</label><input id="p_cat" value="${esc(x.category)}"></div><div class="field"><label>Amount</label><input type="number" id="p_amount" value="${x.amount}"></div><div class="field full"><label>Description</label><textarea id="p_desc">${esc(x.description)}</textarea></div></div><div class="actions"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveFinance('${id}')">Save Transaction</button></div>`)
+}
+async function saveFinance(id){const o={id:id||uid('fin'),date:$('p_date').value,type:$('p_type').value,category:$('p_cat').value,amount:Number($('p_amount').value||0),description:$('p_desc').value};await save('finance',o);closeModal();toast('Transaction saved')}
+
+function openInventory(id=''){
+ const x=data.inventory.find(a=>a.id===id)||{name:'',category:'Feed',stock:0,unit:'kg',minStock:0,cost:0};
+ modal(id?'Edit Inventory':'Add Inventory Item',`<div class="formgrid"><div class="field"><label>Item Name</label><input id="i_name" value="${esc(x.name)}"></div><div class="field"><label>Category</label><input id="i_cat" value="${esc(x.category)}"></div><div class="field"><label>Current Stock</label><input type="number" id="i_stock" value="${x.stock}"></div><div class="field"><label>Unit</label><input id="i_unit" value="${esc(x.unit)}"></div><div class="field"><label>Minimum Stock</label><input type="number" id="i_min" value="${x.minStock}"></div><div class="field"><label>Cost</label><input type="number" id="i_cost" value="${x.cost}"></div></div><div class="actions"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveInventory('${id}')">Save Item</button></div>`)
+}
+async function saveInventory(id){const o={id:id||uid('inv'),name:$('i_name').value,category:$('i_cat').value,stock:Number($('i_stock').value||0),unit:$('i_unit').value,minStock:Number($('i_min').value||0),cost:Number($('i_cost').value||0)};if(!o.name)return toast('Item name is required');await save('inventory',o);closeModal();toast('Inventory saved')}
+
+async function quickBackup(){
+ const backup={app:'KMP Dairy Farms FarmOS',version:1,exportedAt:new Date().toISOString(),data:{...data}};
+ delete backup.data.settings;
+ const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}),a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);a.download=`KMP_Farm_Backup_${today()}.json`;a.click();URL.revokeObjectURL(a.href);
+ localStorage.setItem('lastBackup',new Date().toLocaleString());$('lastBackup').textContent=localStorage.getItem('lastBackup');toast('Complete backup exported')
+}
+async function restoreBackup(file){
+ if(!file)return;try{const b=JSON.parse(await file.text());if(!b.data||!b.data.cows)throw Error('Invalid backup');if(!confirm(`Restore backup from ${new Date(b.exportedAt).toLocaleString()}? Existing records will be replaced for everyone using this app.`))return;
+  for(const s of ['cows','milk','health','breeding','finance','inventory'])data[s]=b.data[s]||[];
+  if(b.data.settings)data.settings={...data.settings,...b.data.settings};
+  await persist();await loadAll();toast('Backup restored successfully')
+ }catch(e){alert('Restore failed: '+e.message)}
+}
+function exportCSV(){
+ const rows=[['Cow ID','Tag','Name','Breed','DOB','Status','Weight','Purchase Date','Purchase Cost'],...data.cows.map(c=>[c.id,c.tag,c.name,c.breed,c.dob,c.status,c.weight,c.purchaseDate,c.purchaseCost])];
+ const csv=rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`KMP_Cows_${today()}.csv`;a.click()
+}
+function printReport(title,headers,rows){
+ const w=window.open('','_blank');w.document.write(`<html><head><title>${title}</title><style>body{font-family:Arial;padding:30px}h1{color:#123}table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid #ddd;text-align:left}th{background:#eef5f8}</style></head><body><h1>${esc(data.settings.farm)}</h1><h2>${title}</h2><p>Generated: ${new Date().toLocaleString()}</p><table><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table><script>window.print()<\/script></body></html>`);w.document.close()
+}
+function reportCows(){printReport('Cow Register',['ID','Name','Breed','DOB','Status','Weight'],data.cows.map(c=>[c.id,c.name,c.breed,c.dob,c.status,c.weight+' kg']))}
+function reportMilk(){printReport('Milk Production',['Date','Cow','Morning','Afternoon','Evening','Total'],data.milk.map(x=>[x.date,cowName(x.cowId),x.morning,x.afternoon,x.evening,Number(x.total).toFixed(1)+' L']))}
+function reportFinance(){printReport('Finance Summary',['Date','Type','Category','Description','Amount'],data.finance.map(x=>[x.date,x.type,x.category,x.description,money(x.amount)]))}
+function reportHealth(){printReport('Health Report',['Date','Cow','Type','Details','Next Due','Cost'],data.health.map(x=>[x.date,cowName(x.cowId),x.type,x.details,x.nextDue,money(x.cost)]))}
+
+async function saveSettings(){
+ data.settings={farm:$('setFarm').value||'KMP Dairy Farms',owner:$('setOwner').value,location:$('setLocation').value,currency:$('setCurrency').value};
+ await persist();toast('Settings saved');renderDashboard()
+}
+async function seedDemo(){
+ if(data.cows.length)return;
+ const cows=[
+  {id:'KM001',name:'Lakshmi',tag:'KMP-001',breed:'HF Cross',dob:'2022-03-12',status:'Lactating',weight:480},
+  {id:'KM002',name:'Ganga',tag:'KMP-002',breed:'Jersey Cross',dob:'2021-11-08',status:'Pregnant',weight:430},
+  {id:'KM003',name:'Ponni',tag:'KMP-003',breed:'HF Cross',dob:'2023-01-19',status:'Lactating',weight:455},
+  {id:'KM004',name:'Kaveri',tag:'KMP-004',breed:'Jersey',dob:'2022-07-05',status:'Dry',weight:410},
+  {id:'KM005',name:'Meena',tag:'KMP-005',breed:'HF Cross',dob:'2024-02-10',status:'Calf',weight:180}
+ ];
+ data.cows=cows.map(c=>({...c,createdAt:new Date().toISOString()}));
+ data.milk=[];
+ for(let i=0;i<14;i++)for(const c of cows.filter(x=>x.status==='Lactating')){const d=new Date();d.setDate(d.getDate()-i);const base=10+Math.random()*5;data.milk.push({id:uid('milk'),date:d.toISOString().slice(0,10),cowId:c.id,morning:+(base*.45).toFixed(1),afternoon:+(base*.25).toFixed(1),evening:+(base*.30).toFixed(1),total:+base.toFixed(1)})}
+ data.health=[{id:uid('health'),date:today(),cowId:'KM001',type:'Vaccination',details:'FMD Vaccine',nextDue:new Date(Date.now()+5*864e5).toISOString().slice(0,10),cost:450}];
+ data.breeding=[{id:uid('breed'),date:'2026-08-10',cowId:'KM002',event:'Pregnancy Check',calving:'2027-05-19',result:'Positive',notes:'Healthy pregnancy'}];
+ data.finance=[{id:uid('fin'),date:today(),type:'Income',category:'Milk Sales',description:'Daily milk collection',amount:5200},{id:uid('fin'),date:today(),type:'Expense',category:'Feed',description:'Concentrate feed',amount:1800}];
+ data.inventory=[{id:uid('inv'),name:'Cattle Concentrate',category:'Feed',stock:320,unit:'kg',minStock:100,cost:32}];
+ await persist();renderAll();toast('Demo farm loaded')
+}
+$('lastBackup').textContent=localStorage.getItem('lastBackup')||'Never';
+(async()=>{try{await openDB();if(!data.cows.length&&confirm('Welcome to KMP Dairy Farms. Load sample demo data?')){await seedDemo()}}catch(e){alert('Could not load farm data: '+e.message)}})();
+setInterval(()=>{if(!$('modal').classList.contains('show'))openDB()},15000);
+</script>
+</body>
+</html>
