@@ -1,0 +1,5 @@
+1) Paste Code.gs into Google Apps Script.
+2) Deploy as Web app.
+3) Copy the /exec URL.
+4) Put it into index.html at API_URL.
+5) Upload index.html to GitHub Pages.
