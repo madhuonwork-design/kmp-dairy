@@ -42,6 +42,14 @@ body.locked .login-screen{display:flex}
 .brand-logo-wrap{width:42px;height:42px;border-radius:50%;background:radial-gradient(circle,#faf6ee,#efe7d8);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .brand-logo{width:33px;height:33px;object-fit:contain;display:block}
 </style>
+<style>
+.pagination{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid #183044}
+.pagination-info{color:var(--muted);font-size:12px}
+.pagination-buttons{display:flex;align-items:center;gap:6px}
+.pagination-buttons .btn{min-width:38px}
+.capacity-note{color:var(--muted);font-size:11px;margin-top:8px}
+</style>
+
 </head>
 <body class="locked">
 
@@ -90,35 +98,35 @@ body.locked .login-screen{display:flex}
 
 <section id="cows" class="page">
   <div class="panel"><div class="panel-head"><h2>Animal Registry</h2><button class="btn primary" onclick="openCow()">＋ Register Cow</button></div>
-  <div class="toolbar"><input class="search" id="cowSearch" placeholder="Search ID, tag, name or breed..." oninput="renderCows()"><select id="cowStatus" onchange="renderCows()"><option value="">All Status</option><option>Lactating</option><option>Pregnant</option><option>Dry</option><option>Calf</option><option>Active</option><option>Sold</option></select></div>
-  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Breed</th><th>DOB</th><th>Status</th><th>Milk/day</th><th>Actions</th></tr></thead><tbody id="cowTable"></tbody></table></div></div>
+  <div class="toolbar"><input class="search" id="cowSearch" placeholder="Search ID, tag, name or breed..." oninput="pageState.cows=1;renderCows()"><select id="cowStatus" onchange="pageState.cows=1;renderCows()"><option value="">All Status</option><option>Lactating</option><option>Pregnant</option><option>Dry</option><option>Calf</option><option>Active</option><option>Sold</option></select></div><div class="capacity-note">Capacity: 2,000,000 cows · Showing 100 per page for fast performance</div>
+  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Breed</th><th>DOB</th><th>Status</th><th>Milk/day</th><th>Actions</th></tr></thead><tbody id="cowTable"></tbody></table></div><div id="cowPagination"></div></div>
 </section>
 
 <section id="milk" class="page">
  <div class="panel"><div class="panel-head"><h2>Milk Production</h2><button class="btn primary" onclick="openMilk()">＋ Record Milk</button></div>
- <div class="toolbar"><input class="search" id="milkSearch" placeholder="Search cow..." oninput="renderMilk()"><input type="date" id="milkDate" onchange="renderMilk()"></div>
- <div class="table-wrap"><table><thead><tr><th>Date</th><th>Cow</th><th>Morning</th><th>Afternoon</th><th>Evening</th><th>Total</th><th>Actions</th></tr></thead><tbody id="milkTable"></tbody></table></div></div>
+ <div class="toolbar"><input class="search" id="milkSearch" placeholder="Search cow..." oninput="pageState.milk=1;renderMilk()"><input type="date" id="milkDate" onchange="pageState.milk=1;renderMilk()"></div>
+ <div class="table-wrap"><table><thead><tr><th>Date</th><th>Cow</th><th>Morning</th><th>Afternoon</th><th>Evening</th><th>Total</th><th>Actions</th></tr></thead><tbody id="milkTable"></tbody></table></div><div id="milkPagination"></div></div>
 </section>
 
 <section id="health" class="page">
  <div class="panel"><div class="panel-head"><h2>Health & Vaccination</h2><button class="btn primary" onclick="openHealth()">＋ Health Record</button></div>
- <div class="table-wrap"><table><thead><tr><th>Date</th><th>Cow</th><th>Type</th><th>Details</th><th>Next Due</th><th>Cost</th><th>Actions</th></tr></thead><tbody id="healthTable"></tbody></table></div></div>
+ <div class="table-wrap"><table><thead><tr><th>Date</th><th>Cow</th><th>Type</th><th>Details</th><th>Next Due</th><th>Cost</th><th>Actions</th></tr></thead><tbody id="healthTable"></tbody></table></div><div id="healthPagination"></div></div>
 </section>
 
 <section id="breeding" class="page">
  <div class="panel"><div class="panel-head"><h2>Breeding & Calving</h2><button class="btn primary" onclick="openBreeding()">＋ Breeding Record</button></div>
- <div class="table-wrap"><table><thead><tr><th>Date</th><th>Cow</th><th>Event</th><th>Expected Calving</th><th>Result</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="breedingTable"></tbody></table></div></div>
+ <div class="table-wrap"><table><thead><tr><th>Date</th><th>Cow</th><th>Event</th><th>Expected Calving</th><th>Result</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="breedingTable"></tbody></table></div><div id="breedingPagination"></div></div>
 </section>
 
 <section id="finance" class="page">
  <div class="cards" id="financeCards"></div>
  <div class="panel"><div class="panel-head"><h2>Income & Expenses</h2><button class="btn primary" onclick="openFinance()">＋ Add Transaction</button></div>
- <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Category</th><th>Description</th><th>Amount</th><th>Actions</th></tr></thead><tbody id="financeTable"></tbody></table></div></div>
+ <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Category</th><th>Description</th><th>Amount</th><th>Actions</th></tr></thead><tbody id="financeTable"></tbody></table></div><div id="financePagination"></div></div>
 </section>
 
 <section id="inventory" class="page">
  <div class="panel"><div class="panel-head"><h2>Feed & Inventory</h2><button class="btn primary" onclick="openInventory()">＋ Add Item</button></div>
- <div class="table-wrap"><table><thead><tr><th>Item</th><th>Category</th><th>Stock</th><th>Unit</th><th>Min Stock</th><th>Cost</th><th>Actions</th></tr></thead><tbody id="inventoryTable"></tbody></table></div></div>
+ <div class="table-wrap"><table><thead><tr><th>Item</th><th>Category</th><th>Stock</th><th>Unit</th><th>Min Stock</th><th>Cost</th><th>Actions</th></tr></thead><tbody id="inventoryTable"></tbody></table></div><div id="inventoryPagination"></div></div>
 </section>
 
 <section id="reports" class="page">
@@ -151,6 +159,13 @@ body.locked .login-screen{display:flex}
 
 const API_URL = 'https://script.google.com/macros/s/AKfycby4arqLfUW_lqFp89hPamwfsE1YsasrgD7PKhAetXXyKTgIbvDCBJW_AZe8rcuxvdHH/exec';
 const SYNC_INTERVAL = 15000;
+
+/* Large-data settings: the application accepts up to 2,000,000 records
+   per data section. Tables render only one small page at a time so the
+   browser does not try to create millions of DOM rows at once. */
+const MAX_RECORDS = 2000000;
+const PAGE_SIZE = 100;
+const pageState = {cows:1,milk:1,health:1,breeding:1,finance:1,inventory:1};
 
 /* =====================================================================
    ACCESS CONTROL — only listed users can sign in.
@@ -379,21 +394,29 @@ async function save(store,obj){
   }else{
     const arr=data[store]||[];
     const i=arr.findIndex(x=>x.id===obj.id);
-    if(i<0)arr.push(obj);else arr[i]=obj;
+    if(i<0){
+      if(arr.length>=MAX_RECORDS){
+        toast(store.toUpperCase()+' limit reached: '+MAX_RECORDS.toLocaleString()+' records');
+        return false;
+      }
+      arr.push(obj);
+    }else arr[i]=obj;
   }
   if(!apiConfigured()){
     renderAll();
     toast('Configure the Apps Script URL first');
-    return;
+    return false;
   }
   try{
     await postForm({action:'upsert',store,record:store==='settings'?data.settings:obj});
     renderAll();
     showSyncStatus('Saved to Google Sheets',true);
+    return true;
   }catch(e){
     console.error(e);
     toast('Save failed — please try again');
     await openDB();
+    return false;
   }
 }
 
@@ -437,10 +460,49 @@ function renderDashboard(){
 function attentionCount(){const d=new Date(Date.now()+7*864e5).toISOString().slice(0,10);return data.health.filter(x=>x.nextDue&&x.nextDue<=d).length}
 function cowName(id){const c=data.cows.find(x=>x.id===id);return c?`${c.name||c.id} (${c.tag||c.id})`:'Unknown'}
 
+function renderPageControls(key,total){
+ const el=$(key+'Pagination');
+ if(!el)return;
+ const pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+ if(pageState[key]>pages)pageState[key]=pages;
+ const page=pageState[key];
+ const start=total?((page-1)*PAGE_SIZE+1):0;
+ const end=Math.min(page*PAGE_SIZE,total);
+ el.innerHTML=`<div class="pagination">
+   <div class="pagination-info">Showing ${start.toLocaleString()}–${end.toLocaleString()} of ${total.toLocaleString()} records · Capacity ${MAX_RECORDS.toLocaleString()}</div>
+   <div class="pagination-buttons">
+    <button class="btn" ${page<=1?'disabled':''} onclick="goPage('${key}',${page-1})">‹</button>
+    <span class="pagination-info">Page ${page.toLocaleString()} / ${pages.toLocaleString()}</span>
+    <button class="btn" ${page>=pages?'disabled':''} onclick="goPage('${key}',${page+1})">›</button>
+   </div>
+ </div>`;
+}
+function goPage(key,page){
+ const total=(key==='cows'?data.cows:key==='milk'?data.milk:key==='health'?data.health:key==='breeding'?data.breeding:key==='finance'?data.finance:data.inventory).length;
+ const pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+ pageState[key]=Math.max(1,Math.min(page,pages));
+ if(key==='cows')renderCows();
+ else if(key==='milk')renderMilk();
+ else if(key==='health')renderHealth();
+ else if(key==='breeding')renderBreeding();
+ else if(key==='finance')renderFinance();
+ else renderInventory();
+}
+function pageItems(arr,key){
+ const pages=Math.max(1,Math.ceil(arr.length/PAGE_SIZE));
+ if(pageState[key]>pages)pageState[key]=pages;
+ const start=(pageState[key]-1)*PAGE_SIZE;
+ return arr.slice(start,start+PAGE_SIZE);
+}
+
 function renderCows(){
  const q=($('cowSearch')?.value||'').toLowerCase(), st=$('cowStatus')?.value||'';
  const arr=data.cows.filter(c=>(!q||[c.id,c.tag,c.name,c.breed].join(' ').toLowerCase().includes(q))&&(!st||c.status===st));
- $('cowTable').innerHTML=arr.length?arr.map(c=>`<tr><td><b>${esc(c.id)}</b></td><td>${esc(c.name||'—')}</td><td>${esc(c.breed||'—')}</td><td>${esc(c.dob||'—')}</td><td><span class="status ${c.status==='Lactating'?'green':c.status==='Pregnant'?'blue':c.status==='Sold'?'red':'yellow'}">${esc(c.status||'Active')}</span></td><td>${milkForCow(c.id).toFixed(1)} L</td><td><button class="btn" onclick="openCow('${c.id}')">Edit</button> <button class="btn danger" onclick="remove('cows','${c.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No cows found. Register your first animal.</td></tr>';
+ const visible=pageItems(arr,'cows');
+ const todayMilk={};
+ for(const x of data.milk){if(x.date===today())todayMilk[x.cowId]=(todayMilk[x.cowId]||0)+Number(x.total||0);}
+ $('cowTable').innerHTML=visible.length?visible.map(c=>`<tr><td><b>${esc(c.id)}</b></td><td>${esc(c.name||'—')}</td><td>${esc(c.breed||'—')}</td><td>${esc(c.dob||'—')}</td><td><span class="status ${c.status==='Lactating'?'green':c.status==='Pregnant'?'blue':c.status==='Sold'?'red':'yellow'}">${esc(c.status||'Active')}</span></td><td>${Number(todayMilk[c.id]||0).toFixed(1)} L</td><td><button class="btn" onclick="openCow('${c.id}')">Edit</button> <button class="btn danger" onclick="remove('cows','${c.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No cows found. Register your first animal.</td></tr>';
+ renderPageControls('cows',arr.length);
 }
 function milkForCow(id){const a=data.milk.filter(x=>x.cowId===id&&x.date===today());return a.reduce((s,x)=>s+Number(x.total||0),0)}
 
@@ -448,31 +510,54 @@ function renderMilk(){
  const q=($('milkSearch')?.value||'').toLowerCase(), d=$('milkDate')?.value||'';
  let arr=data.milk.filter(x=>(!d||x.date===d)&&(!q||cowName(x.cowId).toLowerCase().includes(q)));
  arr=[...arr].sort((a,b)=>b.date.localeCompare(a.date));
- $('milkTable').innerHTML=arr.length?arr.map(x=>`<tr><td>${x.date}</td><td>${esc(cowName(x.cowId))}</td><td>${x.morning}</td><td>${x.afternoon}</td><td>${x.evening}</td><td><b>${Number(x.total).toFixed(1)} L</b></td><td><button class="btn" onclick="openMilk('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('milk','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No milk records.</td></tr>';
+ const visible=pageItems(arr,'milk');
+ $('milkTable').innerHTML=visible.length?visible.map(x=>`<tr><td>${x.date}</td><td>${esc(cowName(x.cowId))}</td><td>${x.morning}</td><td>${x.afternoon}</td><td>${x.evening}</td><td><b>${Number(x.total).toFixed(1)} L</b></td><td><button class="btn" onclick="openMilk('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('milk','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No milk records.</td></tr>';
+ renderPageControls('milk',arr.length);
 }
 
 function renderHealth(){
  const arr=[...data.health].sort((a,b)=>b.date.localeCompare(a.date));
- $('healthTable').innerHTML=arr.length?arr.map(x=>`<tr><td>${x.date}</td><td>${esc(cowName(x.cowId))}</td><td><span class="status ${x.type==='Vaccination'?'green':'yellow'}">${esc(x.type)}</span></td><td>${esc(x.details||x.vaccine||'—')}</td><td>${esc(x.nextDue||'—')}</td><td>${money(x.cost)}</td><td><button class="btn" onclick="openHealth('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('health','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No health records.</td></tr>';
+ const visible=pageItems(arr,'health');
+ $('healthTable').innerHTML=visible.length?visible.map(x=>`<tr><td>${x.date}</td><td>${esc(cowName(x.cowId))}</td><td><span class="status ${x.type==='Vaccination'?'green':'yellow'}">${esc(x.type)}</span></td><td>${esc(x.details||x.vaccine||'—')}</td><td>${esc(x.nextDue||'—')}</td><td>${money(x.cost)}</td><td><button class="btn" onclick="openHealth('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('health','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No health records.</td></tr>';
+ renderPageControls('health',arr.length);
 }
 function renderBreeding(){
- $('breedingTable').innerHTML=data.breeding.length?[...data.breeding].sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${x.date}</td><td>${esc(cowName(x.cowId))}</td><td>${esc(x.event)}</td><td>${esc(x.calving||'—')}</td><td>${esc(x.result||'—')}</td><td>${esc(x.notes||'—')}</td><td><button class="btn" onclick="openBreeding('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('breeding','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No breeding records.</td></tr>';
+ const arr=[...data.breeding].sort((a,b)=>b.date.localeCompare(a.date));
+ const visible=pageItems(arr,'breeding');
+ $('breedingTable').innerHTML=visible.length?visible.map(x=>`<tr><td>${x.date}</td><td>${esc(cowName(x.cowId))}</td><td>${esc(x.event)}</td><td>${esc(x.calving||'—')}</td><td>${esc(x.result||'—')}</td><td>${esc(x.notes||'—')}</td><td><button class="btn" onclick="openBreeding('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('breeding','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No breeding records.</td></tr>';
+ renderPageControls('breeding',arr.length);
 }
 function renderFinance(){
  const inc=data.finance.filter(x=>x.type==='Income').reduce((s,x)=>s+Number(x.amount),0),exp=data.finance.filter(x=>x.type==='Expense').reduce((s,x)=>s+Number(x.amount),0);
  $('financeCards').innerHTML=[['TOTAL INCOME',money(inc)],['TOTAL EXPENSE',money(exp)],['NET BALANCE',money(inc-exp)],['TRANSACTIONS',data.finance.length]].map(x=>`<div class="card"><div class="label">${x[0]}</div><div class="value">${x[1]}</div></div>`).join('');
- $('financeTable').innerHTML=[...data.finance].sort((a,b)=>b.date.localeCompare(a.date)).map(x=>`<tr><td>${x.date}</td><td><span class="status ${x.type==='Income'?'green':'red'}">${x.type}</span></td><td>${esc(x.category)}</td><td>${esc(x.description||'')}</td><td>${money(x.amount)}</td><td><button class="btn" onclick="openFinance('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('finance','${x.id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="6" class="empty">No transactions.</td></tr>';
+ const arr=[...data.finance].sort((a,b)=>b.date.localeCompare(a.date));
+ const visible=pageItems(arr,'finance');
+ $('financeTable').innerHTML=visible.length?visible.map(x=>`<tr><td>${x.date}</td><td><span class="status ${x.type==='Income'?'green':'red'}">${x.type}</span></td><td>${esc(x.category)}</td><td>${esc(x.description||'')}</td><td>${money(x.amount)}</td><td><button class="btn" onclick="openFinance('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('finance','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No transactions.</td></tr>';
+ renderPageControls('finance',arr.length);
 }
 function renderInventory(){
- $('inventoryTable').innerHTML=data.inventory.length?data.inventory.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.category)}</td><td class="${Number(x.stock)<=Number(x.minStock)?'red':''}">${x.stock}</td><td>${esc(x.unit)}</td><td>${x.minStock}</td><td>${money(x.cost)}</td><td><button class="btn" onclick="openInventory('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('inventory','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No inventory items.</td></tr>';
+ const arr=[...data.inventory];
+ const visible=pageItems(arr,'inventory');
+ $('inventoryTable').innerHTML=visible.length?visible.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.category)}</td><td class="${Number(x.stock)<=Number(x.minStock)?'red':''}">${x.stock}</td><td>${esc(x.unit)}</td><td>${x.minStock}</td><td>${money(x.cost)}</td><td><button class="btn" onclick="openInventory('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('inventory','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No inventory items.</td></tr>';
+ renderPageControls('inventory',arr.length);
 }
 
-function cowOptions(selected=''){return '<option value="">Select cow</option>'+data.cows.map(c=>`<option value="${c.id}" ${c.id===selected?'selected':''}>${esc(c.name||c.id)} — ${esc(c.tag||c.id)}</option>`).join('')}
+function cowOptions(selected=''){
+ const LIMIT=5000;
+ let list=data.cows;
+ if(list.length>LIMIT){
+   const selectedCow=selected?list.find(c=>c.id===selected):null;
+   list=list.slice(0,LIMIT);
+   if(selectedCow&&!list.some(c=>c.id===selected))list.push(selectedCow);
+ }
+ return '<option value="">Select cow</option>'+list.map(c=>`<option value="${c.id}" ${c.id===selected?'selected':''}>${esc(c.name||c.id)} — ${esc(c.tag||c.id)}</option>`).join('');
+}
 function modal(title,body){$('modalTitle').textContent=title;$('modalBody').innerHTML=body;$('modal').classList.add('show')}
 function closeModal(){$('modal').classList.remove('show')}
 window.onclick=e=>{if(e.target===$('modal'))closeModal()}
 
 function openCow(id=''){
+ if(!id && data.cows.length>=MAX_RECORDS){toast('Cow Management capacity reached: '+MAX_RECORDS.toLocaleString());return;}
  const c=data.cows.find(x=>x.id===id)||{id:'',name:'',tag:'',rfid:'',breed:'HF Cross',dob:'',status:'Lactating',weight:'',purchaseDate:'',purchaseCost:'',notes:''};
  modal(id?'Edit Cow':'Register New Cow',`<div class="formgrid">
  <div class="field"><label>Cow ID *</label><input id="f_id" value="${esc(c.id)}" ${id?'readonly':''}></div>
