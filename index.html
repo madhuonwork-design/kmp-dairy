@@ -20,6 +20,8 @@ button,input,select,textarea{font:inherit} button{cursor:pointer}
 .page{display:none}.page.active{display:block}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card,.panel{background:linear-gradient(145deg,rgba(15,34,51,.96),rgba(8,22,34,.96));border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow)}.card{padding:18px}.card .label{color:var(--muted);font-size:12px}.card .value{font-size:27px;font-weight:800;margin-top:8px}.trend{font-size:11px;margin-top:7px;color:var(--accent)}.panel{padding:18px;margin-top:15px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px}.panel-head h2{font-size:16px;margin:0}.muted{color:var(--muted)}.grid2{display:grid;grid-template-columns:1.35fr .85fr;gap:15px}.chart{height:270px;display:flex;align-items:end;gap:9px;padding:20px 5px 5px}.bar{flex:1;min-width:7px;border-radius:7px 7px 2px 2px;background:linear-gradient(#42e8a4,#168bb8);position:relative}.bar span{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--muted)}
 .table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid #183044}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.7px}tr:hover td{background:#102333}.status{display:inline-flex;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:700}.green{background:#42e8a41c;color:var(--accent)}.yellow{background:#f6c4531c;color:var(--warn)}.red{background:#ff65771c;color:var(--danger)}.blue{background:#38bdf81c;color:var(--accent2)}
 .toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}.search{flex:1;min-width:220px}.field,input,select,textarea{background:#081723;border:1px solid var(--line);color:var(--text);border-radius:9px;padding:10px 11px;outline:none}.field:focus,input:focus,select:focus,textarea:focus{border-color:#3e7595}textarea{min-height:90px;resize:vertical}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.formgrid .full{grid-column:1/-1}.field label{display:block;color:var(--muted);font-size:11px;margin-bottom:6px}.field{border:0;background:transparent;padding:0}.modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal.show{display:flex}.modal-box{width:min(720px,100%);max-height:90vh;overflow:auto;background:#0b1b2a;border:1px solid #29465c;border-radius:18px;box-shadow:0 30px 100px #000b;padding:20px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-head h2{margin:0;font-size:19px}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.empty{text-align:center;padding:35px;color:var(--muted)}.metric-list{display:grid;gap:12px}.metric{display:flex;justify-content:space-between;padding:12px;background:#091925;border-radius:10px}.notice{padding:12px;border-left:3px solid var(--warn);background:#f6c4530d;margin:8px 0;border-radius:8px;font-size:12px}.profile{display:grid;grid-template-columns:220px 1fr;gap:18px}.cow-avatar{height:210px;border-radius:15px;background:radial-gradient(circle,#19445c,#0a1825);display:grid;place-items:center;font-size:70px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.mini{background:#091925;border:1px solid #183044;padding:13px;border-radius:11px}.mini small{color:var(--muted)}.mini b{display:block;font-size:20px;margin-top:4px}.toast{position:fixed;right:20px;bottom:20px;background:#102a3b;border:1px solid #31536a;padding:12px 15px;border-radius:11px;box-shadow:var(--shadow);display:none;z-index:100}.toast.show{display:block}.hamb{display:none}
+.photo-box{width:100%;height:170px;border:1.5px dashed #2e4f68;border-radius:13px;background:#081723;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;overflow:hidden;position:relative;color:var(--muted);font-size:13px;text-align:center}.photo-box:hover{border-color:#3e7595;color:var(--text)}.photo-box img{width:100%;height:100%;object-fit:cover;display:none}.photo-box .ph-icon{font-size:30px}.photo-box.has-photo .ph-placeholder{display:none}.photo-box.has-photo img{display:block}.photo-tools{display:flex;gap:8px;margin-top:8px}.photo-tools .btn{padding:7px 11px;font-size:12px}.cow-thumb{width:36px;height:36px;border-radius:9px;object-fit:cover;background:#0e2536;display:inline-block;vertical-align:middle}.cow-thumb-ph{width:36px;height:36px;border-radius:9px;background:#0e2536;display:inline-flex;align-items:center;justify-content:center;font-size:17px;vertical-align:middle}
+.report-actions{display:flex;gap:7px;margin-top:13px;flex-wrap:wrap}.report-actions .btn{flex:1;min-width:80px;padding:8px 8px;font-size:12px;text-align:center}.report-card{padding:18px}
 @media(max-width:1050px){.cards{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:760px){.sidebar{transform:translateX(-100%);transition:.25s}.sidebar.open{transform:none}.main{margin-left:0;width:100%;padding:17px}.hamb{display:block}.cards{grid-template-columns:1fr 1fr}.formgrid,.profile{grid-template-columns:1fr}.top{align-items:flex-start}.top-actions .hide-mobile{display:none}}
 
@@ -99,7 +101,7 @@ body.locked .login-screen{display:flex}
 <section id="cows" class="page">
   <div class="panel"><div class="panel-head"><h2>Animal Registry</h2><button class="btn primary" onclick="openCow()">＋ Register Cow</button></div>
   <div class="toolbar"><input class="search" id="cowSearch" placeholder="Search ID, tag, name or breed..." oninput="pageState.cows=1;renderCows()"><select id="cowStatus" onchange="pageState.cows=1;renderCows()"><option value="">All Status</option><option>Lactating</option><option>Pregnant</option><option>Dry</option><option>Calf</option><option>Active</option><option>Sold</option></select></div><div class="capacity-note">Capacity: 2,000,000 cows · Showing 100 per page for fast performance</div>
-  <div class="table-wrap"><table><thead><tr><th>ID</th><th>Name</th><th>Breed</th><th>DOB</th><th>Status</th><th>Milk/day</th><th>Actions</th></tr></thead><tbody id="cowTable"></tbody></table></div><div id="cowPagination"></div></div>
+  <div class="table-wrap"><table><thead><tr><th>Photo</th><th>ID</th><th>Name</th><th>Breed</th><th>DOB</th><th>Status</th><th>Milk/day</th><th>Actions</th></tr></thead><tbody id="cowTable"></tbody></table></div><div id="cowPagination"></div></div>
 </section>
 
 <section id="milk" class="page">
@@ -132,10 +134,18 @@ body.locked .login-screen{display:flex}
 <section id="reports" class="page">
  <div class="panel"><div class="panel-head"><h2>Report Center</h2></div>
  <div class="cards">
-  <button class="card" onclick="reportCows()"><span class="label">REPORT</span><div class="value">🐄 Cow Register</div><div class="trend">Generate printable report</div></button>
-  <button class="card" onclick="reportMilk()"><span class="label">REPORT</span><div class="value">◉ Milk Production</div><div class="trend">Daily production summary</div></button>
-  <button class="card" onclick="reportFinance()"><span class="label">REPORT</span><div class="value">₹ Finance</div><div class="trend">Income & expense summary</div></button>
-  <button class="card" onclick="reportHealth()"><span class="label">REPORT</span><div class="value">♥ Health</div><div class="trend">Medical & vaccination</div></button>
+  <div class="card report-card"><span class="label">REPORT</span><div class="value">🐄 Cow Register</div><div class="trend">Complete livestock database</div>
+   <div class="report-actions"><button class="btn" onclick="reportCows('print')">🖶 Print</button><button class="btn" onclick="reportCows('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportCows('pdf')">⇩ PDF</button></div></div>
+  <div class="card report-card"><span class="label">REPORT</span><div class="value">◉ Milk Production</div><div class="trend">Daily production summary</div>
+   <div class="report-actions"><button class="btn" onclick="reportMilk('print')">🖶 Print</button><button class="btn" onclick="reportMilk('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportMilk('pdf')">⇩ PDF</button></div></div>
+  <div class="card report-card"><span class="label">REPORT</span><div class="value">₹ Finance</div><div class="trend">Income & expense summary</div>
+   <div class="report-actions"><button class="btn" onclick="reportFinance('print')">🖶 Print</button><button class="btn" onclick="reportFinance('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportFinance('pdf')">⇩ PDF</button></div></div>
+  <div class="card report-card"><span class="label">REPORT</span><div class="value">♥ Health</div><div class="trend">Medical & vaccination</div>
+   <div class="report-actions"><button class="btn" onclick="reportHealth('print')">🖶 Print</button><button class="btn" onclick="reportHealth('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportHealth('pdf')">⇩ PDF</button></div></div>
+  <div class="card report-card"><span class="label">REPORT</span><div class="value">🐮 Breeding</div><div class="trend">Reproductive management</div>
+   <div class="report-actions"><button class="btn" onclick="reportBreeding('print')">🖶 Print</button><button class="btn" onclick="reportBreeding('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportBreeding('pdf')">⇩ PDF</button></div></div>
+  <div class="card report-card"><span class="label">REPORT</span><div class="value">▤ Inventory</div><div class="trend">Feed & stock levels</div>
+   <div class="report-actions"><button class="btn" onclick="reportInventory('print')">🖶 Print</button><button class="btn" onclick="reportInventory('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportInventory('pdf')">⇩ PDF</button></div></div>
  </div></div>
 </section>
 
@@ -155,6 +165,9 @@ body.locked .login-screen{display:flex}
 
 <div class="modal" id="modal"><div class="modal-box"><div class="modal-head"><h2 id="modalTitle">Form</h2><button class="btn icon-btn" onclick="closeModal()">×</button></div><div id="modalBody"></div></div></div>
 <div class="toast" id="toast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script>
 
 const API_URL = 'https://script.google.com/macros/s/AKfycby4arqLfUW_lqFp89hPamwfsE1YsasrgD7PKhAetXXyKTgIbvDCBJW_AZe8rcuxvdHH/exec';
@@ -501,7 +514,7 @@ function renderCows(){
  const visible=pageItems(arr,'cows');
  const todayMilk={};
  for(const x of data.milk){if(x.date===today())todayMilk[x.cowId]=(todayMilk[x.cowId]||0)+Number(x.total||0);}
- $('cowTable').innerHTML=visible.length?visible.map(c=>`<tr><td><b>${esc(c.id)}</b></td><td>${esc(c.name||'—')}</td><td>${esc(c.breed||'—')}</td><td>${esc(c.dob||'—')}</td><td><span class="status ${c.status==='Lactating'?'green':c.status==='Pregnant'?'blue':c.status==='Sold'?'red':'yellow'}">${esc(c.status||'Active')}</span></td><td>${Number(todayMilk[c.id]||0).toFixed(1)} L</td><td><button class="btn" onclick="openCow('${c.id}')">Edit</button> <button class="btn danger" onclick="remove('cows','${c.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No cows found. Register your first animal.</td></tr>';
+ $('cowTable').innerHTML=visible.length?visible.map(c=>`<tr><td>${c.photo?`<img class="cow-thumb" src="${c.photo}">`:'<span class="cow-thumb-ph">🐄</span>'}</td><td><b>${esc(c.id)}</b></td><td>${esc(c.name||'—')}</td><td>${esc(c.breed||'—')}</td><td>${esc(c.dob||'—')}</td><td><span class="status ${c.status==='Lactating'?'green':c.status==='Pregnant'?'blue':c.status==='Sold'?'red':'yellow'}">${esc(c.status||'Active')}</span></td><td>${Number(todayMilk[c.id]||0).toFixed(1)} L</td><td><button class="btn" onclick="openCow('${c.id}')">Edit</button> <button class="btn danger" onclick="remove('cows','${c.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="8" class="empty">No cows found. Register your first animal.</td></tr>';
  renderPageControls('cows',arr.length);
 }
 function milkForCow(id){const a=data.milk.filter(x=>x.cowId===id&&x.date===today());return a.reduce((s,x)=>s+Number(x.total||0),0)}
@@ -558,8 +571,17 @@ window.onclick=e=>{if(e.target===$('modal'))closeModal()}
 
 function openCow(id=''){
  if(!id && data.cows.length>=MAX_RECORDS){toast('Cow Management capacity reached: '+MAX_RECORDS.toLocaleString());return;}
- const c=data.cows.find(x=>x.id===id)||{id:'',name:'',tag:'',rfid:'',breed:'HF Cross',dob:'',status:'Lactating',weight:'',purchaseDate:'',purchaseCost:'',notes:''};
+ const c=data.cows.find(x=>x.id===id)||{id:'',name:'',tag:'',rfid:'',breed:'HF Cross',dob:'',status:'Lactating',weight:'',purchaseDate:'',purchaseCost:'',notes:'',photo:''};
  modal(id?'Edit Cow':'Register New Cow',`<div class="formgrid">
+ <div class="field full"><label>Cow Photo</label>
+  <div class="photo-box ${c.photo?'has-photo':''}" id="photoBox" onclick="document.getElementById('f_photo_file').click()">
+   <img id="photoPreview" src="${c.photo?esc(c.photo):''}">
+   <div class="ph-placeholder"><div class="ph-icon">📷</div>Click to upload photo<br><span style="font-size:11px">JPG/PNG, auto-resized</span></div>
+  </div>
+  <input type="file" id="f_photo_file" accept="image/*" hidden onchange="handleCowPhoto(event)">
+  <input type="hidden" id="f_photo" value="${c.photo?esc(c.photo):''}">
+  <div class="photo-tools"><button type="button" class="btn" id="photoRemoveBtn" onclick="removeCowPhoto()" style="${c.photo?'':'display:none'}">✕ Remove Photo</button></div>
+ </div>
  <div class="field"><label>Cow ID *</label><input id="f_id" value="${esc(c.id)}" ${id?'readonly':''}></div>
  <div class="field"><label>Tag Number</label><input id="f_tag" value="${esc(c.tag)}"></div>
  <div class="field"><label>Name / Nickname</label><input id="f_name" value="${esc(c.name)}"></div>
@@ -573,9 +595,34 @@ function openCow(id=''){
  <div class="field full"><label>Notes</label><textarea id="f_notes">${esc(c.notes)}</textarea></div></div>
  <div class="actions"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveCow('${id}')">Save Cow</button></div>`)
 }
+function handleCowPhoto(evt){
+ const file=evt.target.files&&evt.target.files[0];if(!file)return;
+ if(!file.type.startsWith('image/')){toast('Please select an image file');return}
+ const reader=new FileReader();
+ reader.onload=e=>{
+  const img=new Image();
+  img.onload=()=>{
+   const MAX=320;let w=img.width,h=img.height;
+   if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX}}else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX}}
+   const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+   canvas.getContext('2d').drawImage(img,0,0,w,h);
+   const dataUrl=canvas.toDataURL('image/jpeg',0.72);
+   $('f_photo').value=dataUrl;$('photoPreview').src=dataUrl;
+   $('photoBox').classList.add('has-photo');$('photoRemoveBtn').style.display='';
+  };
+  img.onerror=()=>toast('Could not read that image');
+  img.src=e.target.result;
+ };
+ reader.readAsDataURL(file);
+}
+function removeCowPhoto(){
+ $('f_photo').value='';$('photoPreview').src='';
+ $('photoBox').classList.remove('has-photo');$('photoRemoveBtn').style.display='none';
+ $('f_photo_file').value='';
+}
 async function saveCow(old){
  const id=$('f_id').value.trim();if(!id)return toast('Cow ID is required');
- const o={id,name:$('f_name').value.trim(),tag:$('f_tag').value.trim(),rfid:$('f_rfid').value.trim(),breed:$('f_breed').value.trim(),dob:$('f_dob').value,status:$('f_status').value,weight:Number($('f_weight').value||0),purchaseDate:$('f_purchaseDate').value,purchaseCost:Number($('f_purchaseCost').value||0),notes:$('f_notes').value,createdAt:old?(data.cows.find(x=>x.id===old)?.createdAt||new Date().toISOString()):new Date().toISOString()};
+ const o={id,name:$('f_name').value.trim(),tag:$('f_tag').value.trim(),rfid:$('f_rfid').value.trim(),breed:$('f_breed').value.trim(),dob:$('f_dob').value,status:$('f_status').value,weight:Number($('f_weight').value||0),purchaseDate:$('f_purchaseDate').value,purchaseCost:Number($('f_purchaseCost').value||0),notes:$('f_notes').value,photo:$('f_photo').value||'',createdAt:old?(data.cows.find(x=>x.id===old)?.createdAt||new Date().toISOString()):new Date().toISOString()};
  await save('cows',o);closeModal();toast('Cow saved successfully')
 }
 
@@ -630,10 +677,38 @@ function exportCSV(){
 function printReport(title,headers,rows){
  const w=window.open('','_blank');w.document.write(`<html><head><title>${title}</title><style>body{font-family:Arial;padding:30px}h1{color:#123}table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid #ddd;text-align:left}th{background:#eef5f8}</style></head><body><h1>${esc(data.settings.farm)}</h1><h2>${title}</h2><p>Generated: ${new Date().toLocaleString()}</p><table><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table><script>window.print()<\/script></body></html>`);w.document.close()
 }
-function reportCows(){printReport('Cow Register',['ID','Name','Breed','DOB','Status','Weight'],data.cows.map(c=>[c.id,c.name,c.breed,c.dob,c.status,c.weight+' kg']))}
-function reportMilk(){printReport('Milk Production',['Date','Cow','Morning','Afternoon','Evening','Total'],data.milk.map(x=>[x.date,cowName(x.cowId),x.morning,x.afternoon,x.evening,Number(x.total).toFixed(1)+' L']))}
-function reportFinance(){printReport('Finance Summary',['Date','Type','Category','Description','Amount'],data.finance.map(x=>[x.date,x.type,x.category,x.description,money(x.amount)]))}
-function reportHealth(){printReport('Health Report',['Date','Cow','Type','Details','Next Due','Cost'],data.health.map(x=>[x.date,cowName(x.cowId),x.type,x.details,x.nextDue,money(x.cost)]))}
+function safeFilename(title){return (data.settings.farm+'_'+title).replace(/[^a-z0-9]+/gi,'_').replace(/^_+|_+$/g,'')+'_'+today()}
+function exportReportXLSX(title,headers,rows){
+ if(typeof XLSX==='undefined'){toast('Excel library failed to load — check your internet connection');return}
+ const ws=XLSX.utils.aoa_to_sheet([[data.settings.farm],[title],['Generated: '+new Date().toLocaleString()],[],headers,...rows]);
+ ws['!cols']=headers.map(()=>({wch:18}));
+ const wb=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(wb,ws,title.slice(0,31));
+ XLSX.writeFile(wb,safeFilename(title)+'.xlsx');
+ toast('Excel report downloaded')
+}
+function exportReportPDF(title,headers,rows){
+ if(typeof window.jspdf==='undefined'){toast('PDF library failed to load — check your internet connection');return}
+ const {jsPDF}=window.jspdf;
+ const doc=new jsPDF({orientation:headers.length>5?'landscape':'portrait'});
+ doc.setFontSize(16);doc.text(String(data.settings.farm||'Farm'),14,17);
+ doc.setFontSize(12);doc.text(title,14,25);
+ doc.setFontSize(9);doc.setTextColor(120);doc.text('Generated: '+new Date().toLocaleString(),14,31);
+ doc.autoTable({head:[headers],body:rows.map(r=>r.map(v=>String(v??'—'))),startY:36,styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:[18,51,74]}});
+ doc.save(safeFilename(title)+'.pdf');
+ toast('PDF report downloaded')
+}
+function runReport(title,headers,rows,mode){
+ if(mode==='xlsx')exportReportXLSX(title,headers,rows);
+ else if(mode==='pdf')exportReportPDF(title,headers,rows);
+ else printReport(title,headers,rows);
+}
+function reportCows(mode){runReport('Cow Register',['ID','Name','Breed','DOB','Status','Weight'],data.cows.map(c=>[c.id,c.name,c.breed,c.dob,c.status,c.weight+' kg']),mode)}
+function reportMilk(mode){runReport('Milk Production',['Date','Cow','Morning','Afternoon','Evening','Total'],data.milk.map(x=>[x.date,cowName(x.cowId),x.morning,x.afternoon,x.evening,Number(x.total).toFixed(1)+' L']),mode)}
+function reportFinance(mode){runReport('Finance Summary',['Date','Type','Category','Description','Amount'],data.finance.map(x=>[x.date,x.type,x.category,x.description,money(x.amount)]),mode)}
+function reportHealth(mode){runReport('Health Report',['Date','Cow','Type','Details','Next Due','Cost'],data.health.map(x=>[x.date,cowName(x.cowId),x.type,x.details,x.nextDue,money(x.cost)]),mode)}
+function reportBreeding(mode){runReport('Breeding & Calving',['Date','Cow','Event','Expected Calving','Result','Notes'],data.breeding.map(x=>[x.date,cowName(x.cowId),x.event,x.calving,x.result,x.notes]),mode)}
+function reportInventory(mode){runReport('Feed & Inventory',['Item','Category','Stock','Unit','Min Stock','Cost'],data.inventory.map(x=>[x.name,x.category,x.stock,x.unit,x.minStock,money(x.cost)]),mode)}
 
 async function saveSettings(){
  data.settings={farm:$('setFarm').value||'KMP Dairy Farms',owner:$('setOwner').value,location:$('setLocation').value,currency:$('setCurrency').value};
