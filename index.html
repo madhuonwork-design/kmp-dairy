@@ -133,7 +133,18 @@ body.locked .login-screen{display:flex}
 </section>
 
 <section id="reports" class="page">
- <div class="panel"><div class="panel-head"><h2>Report Center</h2></div>
+ <div class="panel"><div class="panel-head"><div><h2>Report Center</h2><div class="muted">Select a date range before generating reports. Date filters apply to Milk, Finance, Health and Breeding reports.</div></div></div>
+ <div class="report-filter-panel">
+  <div class="report-filter-head"><strong>📅 Report Date Range</strong><span id="reportRangeLabel" class="muted">Today</span></div>
+  <div class="report-filter-grid">
+   <div class="field"><label>From Date</label><input type="date" id="reportFromDate" onchange="document.getElementById('reportQuickRange').value='custom';updateReportRangeLabel()"></div>
+   <div class="field"><label>To Date</label><input type="date" id="reportToDate" onchange="document.getElementById('reportQuickRange').value='custom';updateReportRangeLabel()"></div>
+   <div class="field"><label>Quick Range</label><select id="reportQuickRange" onchange="setReportQuickRange(this.value)"><option value="custom">Custom Range</option><option value="today" selected>Today</option><option value="7">Last 7 Days</option><option value="30">Last 30 Days</option><option value="month">This Month</option><option value="year">This Year</option><option value="all">All Available Data</option></select></div>
+   <div class="field"><label>Cow Filter</label><select id="reportCowFilter"><option value="">All Cows</option></select></div>
+  </div>
+  <div class="report-filter-actions"><button class="btn" onclick="applyReportFilters()">✓ Apply Filter</button><button class="btn" onclick="setReportQuickRange('today')">Today</button><button class="btn" onclick="setReportQuickRange('7')">7 Days</button><button class="btn" onclick="setReportQuickRange('30')">30 Days</button><button class="btn" onclick="setReportQuickRange('month')">This Month</button><button class="btn" onclick="setReportQuickRange('all')">All Data</button></div>
+  <div class="report-note">Tip: For a single day, choose the same date in <b>From Date</b> and <b>To Date</b>. For a period such as 01-Sep-2026 to 15-Sep-2026, enter both dates and click <b>Apply Filter</b>.</div>
+ </div>
  <div class="cards">
   <div class="card report-card"><span class="label">REPORT</span><div class="value">🐄 Cow Register</div><div class="trend">Complete livestock database</div>
    <div class="report-actions"><button class="btn" onclick="reportCows('print')">🖶 Print</button><button class="btn" onclick="reportCows('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportCows('pdf')">⇩ PDF</button></div></div>
@@ -147,6 +158,16 @@ body.locked .login-screen{display:flex}
    <div class="report-actions"><button class="btn" onclick="reportBreeding('print')">🖶 Print</button><button class="btn" onclick="reportBreeding('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportBreeding('pdf')">⇩ PDF</button></div></div>
   <div class="card report-card"><span class="label">REPORT</span><div class="value">▤ Inventory</div><div class="trend">Feed & stock levels</div>
    <div class="report-actions"><button class="btn" onclick="reportInventory('print')">🖶 Print</button><button class="btn" onclick="reportInventory('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportInventory('pdf')">⇩ PDF</button></div></div>
+  <div class="card report-card"><span class="label">ANALYSIS</span><div class="value">◉ Daily Milk Summary</div><div class="trend">Date-wise farm production totals</div>
+   <div class="report-actions"><button class="btn" onclick="reportMilkSummary('print')">🖶 Print</button><button class="btn" onclick="reportMilkSummary('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportMilkSummary('pdf')">⇩ PDF</button></div></div>
+  <div class="card report-card"><span class="label">ANALYSIS</span><div class="value">↕ Milk by Cow</div><div class="trend">Cow-wise production ranking</div>
+   <div class="report-actions"><button class="btn" onclick="reportMilkByCow('print')">🖶 Print</button><button class="btn" onclick="reportMilkByCow('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportMilkByCow('pdf')">⇩ PDF</button></div></div>
+  <div class="card report-card"><span class="label">SUMMARY</span><div class="value">₹ Finance P&amp;L</div><div class="trend">Income, expenses and net balance</div>
+   <div class="report-actions"><button class="btn" onclick="reportFinanceSummary('print')">🖶 Print</button><button class="btn" onclick="reportFinanceSummary('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportFinanceSummary('pdf')">⇩ PDF</button></div></div>
+  <div class="card report-card"><span class="label">DUE</span><div class="value">♥ Health Due</div><div class="trend">Upcoming vaccination & health due dates</div>
+   <div class="report-actions"><button class="btn" onclick="reportHealthDue('print')">🖶 Print</button><button class="btn" onclick="reportHealthDue('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportHealthDue('pdf')">⇩ PDF</button></div></div>
+  <div class="card report-card"><span class="label">DUE</span><div class="value">🐮 Calving Due</div><div class="trend">Expected calving within selected range</div>
+   <div class="report-actions"><button class="btn" onclick="reportCalvingDue('print')">🖶 Print</button><button class="btn" onclick="reportCalvingDue('xlsx')">⇩ Excel</button><button class="btn primary" onclick="reportCalvingDue('pdf')">⇩ PDF</button></div></div>
  </div></div>
 </section>
 
@@ -364,6 +385,7 @@ async function openDB(){
     $('setLocation').value=data.settings.location;
     $('setCurrency').value=data.settings.currency;
     renderAll();
+    if($('reportCowFilter'))refreshReportCowFilter();
     showSyncStatus('Set your Apps Script URL in index.html',false);
     return;
   }
@@ -388,6 +410,7 @@ async function openDB(){
     $('setLocation').value=data.settings.location;
     $('setCurrency').value=data.settings.currency;
     renderAll();
+    if($('reportCowFilter'))refreshReportCowFilter();
     showSyncStatus('Live — Google Sheets synced',true);
   }catch(e){
     console.error(e);
@@ -433,7 +456,7 @@ async function save(store,obj){
     }else arr[i]=obj;
   }
   if(!apiConfigured()){
-    renderAll();
+    renderAll();if($('reportCowFilter'))refreshReportCowFilter();
     toast('Configure the Apps Script URL first');
     return false;
   }
@@ -691,41 +714,104 @@ function exportCSV(){
  const rows=[['Cow ID','Tag','Name','Breed','DOB','Status','Weight','Purchase Date','Purchase Cost'],...data.cows.map(c=>[c.id,c.tag,c.name,c.breed,c.dob,c.status,c.weight,c.purchaseDate,c.purchaseCost])];
  const csv=rows.map(r=>r.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`KMP_Cows_${today()}.csv`;a.click()
 }
-function printReport(title,headers,rows){
- const w=window.open('','_blank');w.document.write(`<html><head><title>${title}</title><style>body{font-family:Arial;padding:30px}h1{color:#123}table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid #ddd;text-align:left}th{background:#eef5f8}</style></head><body><h1>${esc(data.settings.farm)}</h1><h2>${title}</h2><p>Generated: ${new Date().toLocaleString()}</p><table><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table><script>window.print()<\/script></body></html>`);w.document.close()
+function reportDateState(){
+ const from=$('reportFromDate')?.value||'';
+ const to=$('reportToDate')?.value||'';
+ const cowId=$('reportCowFilter')?.value||'';
+ return {from,to,cowId,label:from&&to?(from===to?from:(from+' to '+to)):'All available data'};
+}
+function reportDateMatch(date,range){
+ if(!range.from&&!range.to)return true;
+ if(!date)return false;
+ return (!range.from||date>=range.from)&&(!range.to||date<=range.to);
+}
+function reportRowsForDate(rows,dateIndex,range,cowIndex){
+ return rows.filter(r=>reportDateMatch(String(r[dateIndex]||''),range)&&(!range.cowId||!cowIndex||String(r[cowIndex])===String(range.cowId)));
+}
+function reportCowFilterRows(rows,cowIndex,range){
+ return rows.filter(r=>!range.cowId||String(r[cowIndex])===String(range.cowId));
+}
+function reportPeriodText(range){return (range.from&&range.to)?(range.from===range.to?'Date: '+range.from:'Period: '+range.from+' to '+range.to):'Period: All available data';}
+function reportHeaderRows(title,range){return [[data.settings.farm||'KMP Dairy Farms'],[title],[reportPeriodText(range)],['Generated: '+new Date().toLocaleString()],[]]}
+function printReport(title,headers,rows,range){
+ const w=window.open('','_blank'); if(!w){toast('Please allow pop-ups to generate the report');return}
+ const html=`<!doctype html><html><head><title>${esc(title)}</title><style>body{font-family:Arial;padding:30px}h1{color:#123}table{width:100%;border-collapse:collapse}th,td{padding:8px;border:1px solid #ddd;text-align:left}th{background:#eef5f8}.meta{color:#555;margin:4px 0}</style></head><body><h1>${esc(data.settings.farm)}</h1><h2>${esc(title)}</h2><p class="meta">${esc(reportPeriodText(range))}</p><p class="meta">Generated: ${esc(new Date().toLocaleString())}</p><table><thead><tr>${headers.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.map(r=>`<tr>${r.map(x=>`<td>${esc(x)}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${headers.length}">No records found for the selected filters.</td></tr>`}</tbody></table><script>window.print()<\/script></body></html>`;w.document.write(html);w.document.close()
 }
 function safeFilename(title){return (data.settings.farm+'_'+title).replace(/[^a-z0-9]+/gi,'_').replace(/^_+|_+$/g,'')+'_'+today()}
-function exportReportXLSX(title,headers,rows){
+function exportReportXLSX(title,headers,rows,range){
  if(typeof XLSX==='undefined'){toast('Excel library failed to load — check your internet connection');return}
- const ws=XLSX.utils.aoa_to_sheet([[data.settings.farm],[title],['Generated: '+new Date().toLocaleString()],[],headers,...rows]);
+ const ws=XLSX.utils.aoa_to_sheet([...reportHeaderRows(title,range),headers,...rows]);
  ws['!cols']=headers.map(()=>({wch:18}));
- const wb=XLSX.utils.book_new();
- XLSX.utils.book_append_sheet(wb,ws,title.slice(0,31));
- XLSX.writeFile(wb,safeFilename(title)+'.xlsx');
- toast('Excel report downloaded')
+ const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,title.slice(0,31));XLSX.writeFile(wb,safeFilename(title)+'.xlsx');toast('Excel report downloaded')
 }
-function exportReportPDF(title,headers,rows){
+function exportReportPDF(title,headers,rows,range){
  if(typeof window.jspdf==='undefined'){toast('PDF library failed to load — check your internet connection');return}
- const {jsPDF}=window.jspdf;
- const doc=new jsPDF({orientation:headers.length>5?'landscape':'portrait'});
- doc.setFontSize(16);doc.text(String(data.settings.farm||'Farm'),14,17);
- doc.setFontSize(12);doc.text(title,14,25);
- doc.setFontSize(9);doc.setTextColor(120);doc.text('Generated: '+new Date().toLocaleString(),14,31);
- doc.autoTable({head:[headers],body:rows.map(r=>r.map(v=>String(v??'—'))),startY:36,styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:[18,51,74]}});
- doc.save(safeFilename(title)+'.pdf');
- toast('PDF report downloaded')
+ const {jsPDF}=window.jspdf;const doc=new jsPDF({orientation:headers.length>5?'landscape':'portrait'});
+ doc.setFontSize(16);doc.text(String(data.settings.farm||'Farm'),14,17);doc.setFontSize(12);doc.text(title,14,25);doc.setFontSize(9);doc.setTextColor(120);doc.text(reportPeriodText(range),14,31);doc.text('Generated: '+new Date().toLocaleString(),14,36);
+ doc.autoTable({head:[headers],body:rows.length?rows.map(r=>r.map(v=>String(v??'—'))):[['No records found for the selected filters.']],startY:42,styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:[18,51,74]}});doc.save(safeFilename(title)+'.pdf');toast('PDF report downloaded')
 }
-function runReport(title,headers,rows,mode){
- if(mode==='xlsx')exportReportXLSX(title,headers,rows);
- else if(mode==='pdf')exportReportPDF(title,headers,rows);
- else printReport(title,headers,rows);
+function runReport(title,headers,rows,mode,range=reportDateState()){
+ const filteredRows=rows;
+ if(mode==='xlsx')exportReportXLSX(title,headers,filteredRows,range);else if(mode==='pdf')exportReportPDF(title,headers,filteredRows,range);else printReport(title,headers,filteredRows,range)
 }
-function reportCows(mode){runReport('Cow Register',['ID','Name','Breed','DOB','Status','Weight'],data.cows.map(c=>[c.id,c.name,c.breed,c.dob,c.status,c.weight+' kg']),mode)}
-function reportMilk(mode){runReport('Milk Production',['Date','Cow','Morning','Afternoon','Evening','Total'],data.milk.map(x=>[x.date,cowName(x.cowId),x.morning,x.afternoon,x.evening,Number(x.total).toFixed(1)+' L']),mode)}
-function reportFinance(mode){runReport('Finance Summary',['Date','Type','Category','Description','Amount'],data.finance.map(x=>[x.date,x.type,x.category,x.description,money(x.amount)]),mode)}
-function reportHealth(mode){runReport('Health Report',['Date','Cow','Type','Details','Next Due','Cost'],data.health.map(x=>[x.date,cowName(x.cowId),x.type,x.details,x.nextDue,money(x.cost)]),mode)}
-function reportBreeding(mode){runReport('Breeding & Calving',['Date','Cow','Event','Expected Calving','Result','Notes'],data.breeding.map(x=>[x.date,cowName(x.cowId),x.event,x.calving,x.result,x.notes]),mode)}
-function reportInventory(mode){runReport('Feed & Inventory',['Item','Category','Stock','Unit','Min Stock','Cost'],data.inventory.map(x=>[x.name,x.category,x.stock,x.unit,x.minStock,money(x.cost)]),mode)}
+function selectedReportCowName(){const id=$('reportCowFilter')?.value||'';return id?cowName(id):'All Cows'}
+function reportCows(mode){const range=reportDateState();const rows=reportCowFilterRows(data.cows.map(c=>[c.id,c.name,c.breed,c.dob,c.status,c.weight+' kg']),1,range);runReport('Cow Register',['ID','Name','Breed','DOB','Status','Weight'],rows,mode,range)}
+function reportMilk(mode){const range=reportDateState();const rows=data.milk.filter(x=>reportDateMatch(x.date,range)&&(!range.cowId||String(x.cowId)===String(range.cowId))).map(x=>[x.date,cowName(x.cowId),x.morning,x.afternoon,x.evening,Number(x.total).toFixed(1)+' L']);runReport('Milk Production',['Date','Cow','Morning','Afternoon','Evening','Total'],rows,mode,range)}
+function reportFinance(mode){const range=reportDateState();const rows=data.finance.filter(x=>reportDateMatch(x.date,range)).map(x=>[x.date,x.type,x.category,x.description,money(x.amount)]);runReport('Finance Summary',['Date','Type','Category','Description','Amount'],rows,mode,range)}
+function reportHealth(mode){const range=reportDateState();const rows=data.health.filter(x=>reportDateMatch(x.date,range)&&(!range.cowId||String(x.cowId)===String(range.cowId))).map(x=>[x.date,cowName(x.cowId),x.type,x.details,x.nextDue,money(x.cost)]);runReport('Health Report',['Date','Cow','Type','Details','Next Due','Cost'],rows,mode,range)}
+function reportBreeding(mode){const range=reportDateState();const rows=data.breeding.filter(x=>reportDateMatch(x.date,range)&&(!range.cowId||String(x.cowId)===String(range.cowId))).map(x=>[x.date,cowName(x.cowId),x.event,x.calving,x.result,x.notes]);runReport('Breeding & Calving',['Date','Cow','Event','Expected Calving','Result','Notes'],rows,mode,range)}
+function reportInventory(mode){const range=reportDateState();const rows=data.inventory.map(x=>[x.name,x.category,x.stock,x.unit,x.minStock,money(x.cost)]);runReport('Feed & Inventory',['Item','Category','Stock','Unit','Min Stock','Cost'],rows,mode,range)}
+function reportMilkSummary(mode){
+ const range=reportDateState();const map={};
+ data.milk.filter(x=>reportDateMatch(x.date,range)&&(!range.cowId||String(x.cowId)===String(range.cowId))).forEach(x=>{const d=x.date;map[d]=(map[d]||0)+Number(x.total||0)});
+ const rows=Object.keys(map).sort().map(d=>[d,map[d].toFixed(1)+' L']);
+ const total=Object.values(map).reduce((a,b)=>a+b,0);if(rows.length)rows.push(['TOTAL',total.toFixed(1)+' L']);
+ runReport('Daily Milk Summary',['Date','Farm Total'],rows,mode,range)
+}
+function reportMilkByCow(mode){
+ const range=reportDateState();const map={};
+ data.milk.filter(x=>reportDateMatch(x.date,range)&&(!range.cowId||String(x.cowId)===String(range.cowId))).forEach(x=>{const id=x.cowId;map[id]=(map[id]||0)+Number(x.total||0)});
+ const rows=Object.entries(map).map(([id,total])=>[id,cowName(id),total.toFixed(1)+' L']).sort((a,b)=>parseFloat(b[2])-parseFloat(a[2]));
+ runReport('Milk by Cow',['Cow ID','Cow','Total Milk'],rows,mode,range)
+}
+function reportFinanceSummary(mode){
+ const range=reportDateState();let income=0,expense=0;
+ data.finance.filter(x=>reportDateMatch(x.date,range)).forEach(x=>{const amount=Number(x.amount||0);if(String(x.type).toLowerCase()==='income')income+=amount;else expense+=amount});
+ const rows=[['Income',money(income)],['Expenses',money(expense)],['Net Balance',money(income-expense)]];
+ runReport('Finance P&L',['Metric','Amount'],rows,mode,range)
+}
+function reportHealthDue(mode){
+ const range=reportDateState();const rows=data.health.filter(x=>{const due=x.nextDue||'';return reportDateMatch(due,range)&&(!range.cowId||String(x.cowId)===String(range.cowId))}).map(x=>[x.nextDue,cowName(x.cowId),x.type,x.details,money(x.cost)]).sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
+ runReport('Health Due Report',['Due Date','Cow','Type','Details','Cost'],rows,mode,range)
+}
+function reportCalvingDue(mode){
+ const range=reportDateState();const rows=data.breeding.filter(x=>{const due=x.calving||'';return due&&reportDateMatch(due,range)&&(!range.cowId||String(x.cowId)===String(range.cowId))}).map(x=>[x.calving,cowName(x.cowId),x.event,x.result,x.notes]).sort((a,b)=>String(a[0]).localeCompare(String(b[0])));
+ runReport('Calving Due Report',['Expected Calving','Cow','Event','Result','Notes'],rows,mode,range)
+}
+function refreshReportCowFilter(){
+ const cow=$('reportCowFilter');if(!cow)return;const current=cow.value;cow.innerHTML='<option value="">All Cows</option>';
+ [...data.cows].sort((a,b)=>String(a.name||a.id).localeCompare(String(b.name||b.id))).forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=(c.name||c.id)+' ('+c.id+')';cow.appendChild(o)});if([...cow.options].some(o=>o.value===current))cow.value=current;
+}
+function initReportFilters(){
+ const from=$('reportFromDate'),to=$('reportToDate'),cow=$('reportCowFilter');if(!from||!to||!cow)return;
+ const t=today();from.value=t;to.value=t;cow.innerHTML='<option value="">All Cows</option>';
+ [...data.cows].sort((a,b)=>String(a.name||a.id).localeCompare(String(b.name||b.id))).forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=(c.name||c.id)+' ('+c.id+')';cow.appendChild(o)});
+ updateReportRangeLabel();
+}
+function updateReportRangeLabel(){const r=reportDateState();const el=$('reportRangeLabel');if(el)el.textContent=r.from&&r.to?(r.from===r.to?'Single day: '+r.from:'Selected: '+r.from+' → '+r.to):'All available data'}
+function localDateInputValue(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');return y+'-'+m+'-'+day}
+function setReportQuickRange(v){
+ const from=$('reportFromDate'),to=$('reportToDate'),sel=$('reportQuickRange');if(!from||!to)return;const t=new Date();const end=localDateInputValue(t);
+ if(v==='all'){from.value='';to.value='';}
+ else if(v==='today'){from.value=end;to.value=end;}
+ else if(v==='month'){from.value=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-01';to.value=end;}
+ else if(v==='year'){from.value=t.getFullYear()+'-01-01';to.value=end;}
+ else if(/^\d+$/.test(v)){const n=Number(v);const d=new Date(t);d.setDate(d.getDate()-(n-1));from.value=localDateInputValue(d);to.value=end;}
+ if(sel)sel.value=v;updateReportRangeLabel();
+}
+function applyReportFilters(){
+ const from=$('reportFromDate')?.value||'',to=$('reportToDate')?.value||'';if(from&&to&&from>to){toast('From Date cannot be later than To Date');return false}updateReportRangeLabel();toast('Report filters applied');return true
+}
 
 async function saveSettings(){
  data.settings={farm:$('setFarm').value||'KMP Dairy Farms',owner:$('setOwner').value,location:$('setLocation').value,currency:$('setCurrency').value};
@@ -754,12 +840,16 @@ function bootApp(){
   if(bootStarted)return; // avoid double-booting if unlocked more than once
   bootStarted=true;
   $('lastBackup').textContent=localStorage.getItem('lastBackup')||'Never';
-  (async()=>{try{await openDB()}catch(e){alert('Could not load farm data: '+e.message)}})();
+  (async()=>{try{await openDB();initReportFilters()}catch(e){alert('Could not load farm data: '+e.message)}})();
   setInterval(()=>{if(!$('modal').classList.contains('show')&&!document.body.classList.contains('locked'))loadAll()},SYNC_INTERVAL);
 }
 checkSession();
 </script>
 <style>
+.report-filter-panel{margin:0 0 22px;padding:18px;border:1px solid rgba(13,102,84,.14);border-radius:16px;background:linear-gradient(145deg,#f7fbf9,#eef6f3);box-shadow:0 8px 20px rgba(18,51,74,.06)}
+.report-filter-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.report-filter-grid{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:14px}.report-filter-grid .field{display:flex;flex-direction:column;gap:6px}.report-filter-grid label{font-size:12px;font-weight:700;color:#365a52}.report-filter-grid input,.report-filter-grid select{width:100%;box-sizing:border-box}.report-filter-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.report-note{margin-top:12px;font-size:12px;color:#5d716c}.report-card .report-actions{display:flex;flex-wrap:wrap;gap:6px}
+@media(max-width:900px){.report-filter-grid{grid-template-columns:repeat(2,minmax(150px,1fr))}}
+@media(max-width:560px){.report-filter-grid{grid-template-columns:1fr}}
 /* Enhanced analytics and report presentation */
 .chart-page{max-width:1440px}.analytics-hero{position:relative;overflow:hidden;padding:28px;border-radius:22px;background:linear-gradient(125deg,#0b392f 0%,#0d6654 52%,#d8a33d 150%);color:#fff;box-shadow:0 18px 45px rgba(10,69,57,.22);margin-bottom:20px}.analytics-hero:after{content:'';position:absolute;width:330px;height:330px;right:-100px;top:-180px;border:48px solid rgba(255,255,255,.09);border-radius:50%}.analytics-hero h2{margin:0 0 8px;font-size:28px;letter-spacing:-.5px}.analytics-hero p{position:relative;margin:0;color:#d9f3ea;max-width:650px}.analytics-hero .logo-mark{display:inline-grid;place-items:center;width:46px;height:46px;border-radius:14px;background:#f7c85a;color:#0d493d;font-size:26px;float:right;position:relative;z-index:1}.analytics-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.analytics-panel{min-height:300px;padding:20px;border-radius:20px;background:linear-gradient(145deg,#fff,#f3f8f5);border:1px solid rgba(13,102,84,.09);box-shadow:0 14px 32px rgba(18,51,74,.09)}.analytics-panel.full{grid-column:1/-1}.analytics-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:16px}.analytics-head h3{font-size:16px;margin:0;color:#173b35}.analytics-head span{font-size:12px;color:#6e817d}.chart-3d{height:220px;display:flex;align-items:flex-end;gap:clamp(8px,1.5vw,18px);padding:12px 8px 25px;border-bottom:1px solid #dbe9e4;background:repeating-linear-gradient(to top,transparent 0,transparent 53px,rgba(13,102,84,.06) 54px)}.cube-col{height:100%;flex:1;min-width:18px;display:flex;align-items:flex-end;justify-content:center;position:relative}.cube{width:min(45px,75%);min-height:8px;border-radius:5px 5px 2px 2px;background:linear-gradient(90deg,var(--c),color-mix(in srgb,var(--c) 67%,#fff));box-shadow:8px 8px 0 color-mix(in srgb,var(--c) 42%,#092f27),0 10px 14px rgba(10,58,47,.2);position:relative;transition:height .35s ease}.cube:before{content:'';position:absolute;left:3px;right:-8px;top:-6px;height:8px;background:color-mix(in srgb,var(--c) 58%,#fff);transform:skewX(-42deg);border-radius:3px 3px 0 0}.cube-label{position:absolute;bottom:-22px;font-size:10px;color:#6e817d;white-space:nowrap}.cube-value{position:absolute;top:-21px;font-size:11px;font-weight:700;color:#155e50}.donut-layout{height:220px;display:flex;align-items:center;justify-content:center;gap:28px}.donut{width:155px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#0e826a 0deg var(--a),#dcaa45 var(--a) 250deg,#e6eeeb 250deg 360deg);box-shadow:inset 0 0 0 18px #fff,0 12px 20px rgba(18,51,74,.12);position:relative}.donut:after{content:'';position:absolute;inset:15px;border-radius:50%;background:#fff;box-shadow:inset 0 4px 10px rgba(18,51,74,.08)}.donut b{z-index:1;color:#0c6252;font-size:22px}.legend{display:grid;gap:11px}.legend div{font-size:13px;color:#526963}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px}.analytics-empty{height:210px;display:grid;place-items:center;color:#82938e;text-align:center}.report-card{position:relative;overflow:hidden;border:1px solid rgba(13,102,84,.12);border-radius:18px;background:linear-gradient(145deg,#fff,#f5fbf7);box-shadow:0 12px 24px rgba(18,51,74,.08)}.report-card:before{content:'✦';position:absolute;right:15px;top:9px;color:#d8a33d;font-size:24px}.report-card .label{color:#0d6654}.report-card .value{color:#163b34}.report-actions .btn.primary{background:linear-gradient(135deg,#0d725e,#0a5143);border:0}.report-brand{display:flex;align-items:center;gap:10px}.report-brand-mark{width:36px;height:36px;border-radius:11px;background:linear-gradient(145deg,#0f765f,#073f34);color:#f5cb68;display:grid;place-items:center;font-size:21px;box-shadow:0 5px 10px rgba(11,74,61,.22)}
 @media(max-width:760px){.analytics-grid{grid-template-columns:1fr}.analytics-panel.full{grid-column:auto}.analytics-hero h2{font-size:23px}.donut-layout{gap:14px}.donut{width:125px}}
@@ -857,7 +947,7 @@ checkSession();
 /* Cow yield comparison */
 .yield-table-wrap{overflow:auto;border:1px solid #e0ece7;border-radius:14px}.yield-table{width:100%;border-collapse:separate;border-spacing:0;min-width:620px;font-size:13px}.yield-table th{padding:11px 13px;background:#eef7f3;color:#46675e;font-size:11px;letter-spacing:.35px;text-transform:uppercase;text-align:right;border-bottom:1px solid #dcebe5}.yield-table th:first-child,.yield-table td:first-child{text-align:left}.yield-table td{padding:12px 13px;text-align:right;border-bottom:1px solid #edf3f0;color:#294c44}.yield-table tr:last-child td{border-bottom:0}.yield-cow{font-weight:700;color:#0d6654}.yield-tag{color:#81958e;font-size:11px;margin-left:5px}.yield-value{display:inline-block;min-width:65px;padding:5px 8px;border-radius:8px;font-weight:700}.yield-high{background:#dff4e9;color:#08704f;box-shadow:inset 0 0 0 1px #aee0c3}.yield-low{background:#fff1dc;color:#a75f08;box-shadow:inset 0 0 0 1px #f0cf9a}.yield-key{display:flex;gap:14px;align-items:center;font-size:11px;color:#6a8179}.yield-key span:before{content:'';display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px}.yield-key .key-high:before{background:#67bf8f}.yield-key .key-low:before{background:#e8ad4b}.yield-note{margin-top:10px;color:#70867f;font-size:11px}
 /* Interactive cow-yield explorer */
-.yield-controls{display:flex;flex-wrap:wrap;gap:10px;padding:12px;margin-bottom:13px;background:#f0f8f4;border-radius:14px}.yield-control{display:grid;gap:4px;font-size:10px;color:#5e766e;font-weight:700;letter-spacing:.2px}.yield-control select,.yield-control input{min-height:34px;border:1px solid #cde2d9;border-radius:8px;background:#fff;color:#18473d;padding:0 9px;font:12px inherit}.custom-range{display:none;gap:8px;align-items:end}.custom-range.show{display:flex}.cow-day-scroll{overflow-x:auto;border:1px solid #dfebe6;border-radius:14px;background:repeating-linear-gradient(to top,#fff 0,#fff 43px,#f1f7f4 44px)}.cow-day-chart{height:238px;min-width:680px;padding:10px 12px 30px;display:flex;align-items:flex-end;gap:3px}.cow-day-group{height:100%;min-width:17px;flex:1;display:flex;align-items:flex-end;justify-content:center;gap:2px;position:relative}.cow-day-bar{width:14px;min-height:3px;position:relative;border-radius:3px 3px 1px 1px;box-shadow:2px 3px 0 rgba(12,74,61,.22)}.cow-day-value{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);font-size:10px;line-height:1;font-weight:900;color:#173f36;background:#fff;border:1px solid #b9d5cc;border-radius:5px;padding:3px 4px;white-space:nowrap;pointer-events:none;z-index:4;box-shadow:0 1px 3px rgba(20,70,58,.14)}.cow-day-bar.compare .cow-day-value{color:#76500d;border-color:#e2c980;background:#fffdf5}.cow-day-bar.own{background:linear-gradient(#10a484,#0b7160)}.cow-day-bar.compare{background:linear-gradient(#e3bc59,#bd8120)}.cow-day-label{position:absolute;bottom:-24px;left:50%;transform:translateX(-50%) rotate(-45deg);font-size:9px;color:#778c85;white-space:nowrap}.cow-yield-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:13px}.cow-yield-stat{padding:12px;border-radius:12px;background:#f6faf8;border:1px solid #e2eee9}.cow-yield-stat b{display:block;color:#105f4e;font-size:14px}.cow-yield-stat span{font-size:11px;color:#6e837c}.cow-yield-stat.gold b{color:#9b6511}.comparison-legend{display:flex;gap:14px;align-items:center;font-size:11px;color:#637a72}.comparison-legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px}.range-message{font-size:11px;color:#896114;padding:8px 0 0}@media(max-width:700px){.cow-yield-summary{grid-template-columns:1fr}.yield-controls{display:grid;grid-template-columns:1fr 1fr}.custom-range{grid-column:1/-1}.comparison-legend{display:none}}
+.yield-controls{display:flex;flex-wrap:wrap;gap:10px;padding:12px;margin-bottom:13px;background:#f0f8f4;border-radius:14px}.yield-control{display:grid;gap:4px;font-size:10px;color:#5e766e;font-weight:700;letter-spacing:.2px}.yield-control select,.yield-control input{min-height:34px;border:1px solid #cde2d9;border-radius:8px;background:#fff;color:#18473d;padding:0 9px;font:12px inherit}.custom-range{display:none;gap:8px;align-items:end}.custom-range.show{display:flex}.cow-day-scroll{overflow-x:auto;border:1px solid #dfebe6;border-radius:14px;background:repeating-linear-gradient(to top,#fff 0,#fff 43px,#f1f7f4 44px)}.cow-day-chart{height:238px;min-width:680px;padding:10px 12px 30px;display:flex;align-items:flex-end;gap:3px}.cow-day-group{height:100%;min-width:17px;flex:1;display:flex;align-items:flex-end;justify-content:center;gap:2px;position:relative}.cow-day-bar{position:relative;width:6px;min-height:2px;border-radius:3px 3px 1px 1px;box-shadow:2px 3px 0 rgba(12,74,61,.22)}.cow-day-value{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);font-size:8px;font-weight:800;color:#315b52;white-space:nowrap;pointer-events:none}.cow-day-bar.compare .cow-day-value{color:#8b641c}.cow-day-bar.own{background:linear-gradient(#10a484,#0b7160)}.cow-day-bar.compare{background:linear-gradient(#e3bc59,#bd8120)}.cow-day-label{position:absolute;bottom:-24px;left:50%;transform:translateX(-50%) rotate(-45deg);font-size:9px;color:#778c85;white-space:nowrap}.cow-yield-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:13px}.cow-yield-stat{padding:12px;border-radius:12px;background:#f6faf8;border:1px solid #e2eee9}.cow-yield-stat b{display:block;color:#105f4e;font-size:14px}.cow-yield-stat span{font-size:11px;color:#6e837c}.cow-yield-stat.gold b{color:#9b6511}.comparison-legend{display:flex;gap:14px;align-items:center;font-size:11px;color:#637a72}.comparison-legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px}.range-message{font-size:11px;color:#896114;padding:8px 0 0}@media(max-width:700px){.cow-yield-summary{grid-template-columns:1fr}.yield-controls{display:grid;grid-template-columns:1fr 1fr}.custom-range{grid-column:1/-1}.comparison-legend{display:none}}
 /* Farm Assistant: a live, record-aware help panel */
 .assistant-launch{position:fixed;right:24px;bottom:24px;z-index:50;border:0;border-radius:18px;padding:13px 17px;background:linear-gradient(135deg,#0b725e,#093d34);color:#fff;font:700 13px inherit;box-shadow:0 12px 28px rgba(5,64,53,.3);cursor:pointer}.assistant-launch:hover{transform:translateY(-2px)}.assistant-panel{position:fixed;right:24px;bottom:82px;width:min(400px,calc(100vw - 30px));height:min(590px,calc(100vh - 116px));z-index:51;background:#fff;border:1px solid #dce9e4;border-radius:22px;box-shadow:0 24px 64px rgba(11,54,46,.25);overflow:hidden;display:none;flex-direction:column}.assistant-panel.show{display:flex}.assistant-top{padding:17px 18px;background:linear-gradient(135deg,#0a5143,#0e8069);color:#fff;display:flex;align-items:center;gap:11px}.assistant-top .assistant-avatar{width:38px;height:38px;border-radius:12px;background:#f2c45a;color:#0a5143;display:grid;place-items:center;font-size:20px}.assistant-top b{display:block;font-size:15px}.assistant-top small{color:#c8eee3;font-size:11px}.assistant-close{margin-left:auto;border:0;background:transparent;color:#fff;font-size:22px;cursor:pointer}.assistant-notice{font-size:11px;line-height:1.4;color:#627a73;background:#eff8f4;padding:9px 14px}.assistant-messages{flex:1;overflow:auto;padding:16px;background:linear-gradient(#fbfdfc,#f4f9f7);display:flex;flex-direction:column;gap:11px}.assistant-msg{max-width:86%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.48;white-space:pre-line}.assistant-msg.bot{align-self:flex-start;background:#fff;color:#264c43;border:1px solid #e0ece7;border-bottom-left-radius:4px}.assistant-msg.user{align-self:flex-end;background:#0d725e;color:#fff;border-bottom-right-radius:4px}.assistant-suggestions{padding:0 12px 9px;background:#f4f9f7;display:flex;gap:6px;overflow:auto}.assistant-suggestions button{white-space:nowrap;border:1px solid #c9e0d8;background:#fff;border-radius:999px;padding:6px 9px;color:#0d6654;font:11px inherit;cursor:pointer}.assistant-compose{padding:11px;display:flex;gap:7px;border-top:1px solid #e2ece8;background:#fff}.assistant-compose input{min-width:0;flex:1;border:1px solid #cfe0da;border-radius:11px;padding:10px;font:13px inherit;outline:none}.assistant-compose input:focus{border-color:#0d8069;box-shadow:0 0 0 3px rgba(13,128,105,.1)}.assistant-compose button{border:0;border-radius:11px;padding:0 11px;background:#e6f2ed;color:#0d6654;cursor:pointer;font:700 14px inherit}.assistant-compose .send{background:#0d725e;color:#fff}.assistant-compose .listening{background:#dba640;color:#fff;animation:assistantPulse 1s infinite}@keyframes assistantPulse{50%{box-shadow:0 0 0 5px rgba(219,166,64,.18)}}
 @media(max-width:600px){.assistant-launch{right:15px;bottom:15px}.assistant-panel{right:15px;bottom:72px;height:min(600px,calc(100vh - 92px))}}
@@ -872,14 +962,21 @@ checkSession();
  function snapshot(){const active=data.cows.filter(c=>!['Sold','Deceased'].includes(c.status)),day=today(),milkToday=data.milk.filter(x=>x.date===day).reduce((s,x)=>s+Number(x.total||0),0),income=data.finance.filter(x=>x.type==='Income').reduce((s,x)=>s+Number(x.amount||0),0),expense=data.finance.filter(x=>x.type==='Expense').reduce((s,x)=>s+Number(x.amount||0),0),dueDate=new Date(Date.now()+7*864e5).toISOString().slice(0,10),due=data.health.filter(x=>x.nextDue&&x.nextDue<=dueDate),low=data.inventory.filter(x=>Number(x.stock||0)<=Number(x.minStock||0));return {active,day,milkToday,income,expense,due,low}}
  function findCowInQuestion(q){
    const t=(q||'').toLowerCase().trim();
-   const exact=data.cows.find(c=>[c.id,c.tag,c.name].filter(Boolean).some(v=>String(v).toLowerCase()===t));
+   const normalized=' '+t.replace(/[^a-z0-9\u0B80-\u0BFF]+/g,' ').replace(/\s+/g,' ').trim()+' ';
+   const cows=Array.isArray(data.cows)?data.cows:[];
+   const exact=cows.find(c=>[c.id,c.tag,c.name].filter(Boolean).some(v=>String(v).toLowerCase().trim()===t));
    if(exact)return exact;
-   const matches=data.cows.filter(c=>[c.id,c.tag,c.name].filter(Boolean).some(v=>t.includes(String(v).toLowerCase())));
-   return matches.sort((a,b)=>{
-     const al=[a.id,a.tag,a.name].filter(Boolean).some(v=>t===String(v).toLowerCase())?0:1;
-     const bl=[b.id,b.tag,b.name].filter(Boolean).some(v=>t===String(v).toLowerCase())?0:1;
-     return al-bl;
-   })[0]||null;
+   const candidates=[];
+   cows.forEach(c=>{
+     [c.name,c.id,c.tag].filter(Boolean).forEach(v=>{
+       const value=String(v).toLowerCase().trim();
+       if(value.length<3)return;
+       const needle=' '+value.replace(/[^a-z0-9\u0B80-\u0BFF]+/g,' ').replace(/\s+/g,' ').trim()+' ';
+       if(normalized.includes(needle))candidates.push({cow:c,score:value.length});
+     });
+   });
+   candidates.sort((a,b)=>b.score-a.score);
+   return candidates[0]?.cow||null;
  }
  function milkRowsForCow(cowId,startDate,endDate){
    return data.milk.filter(x=>x.cowId===cowId&&x.date>=startDate&&x.date<=endDate);
@@ -889,233 +986,172 @@ checkSession();
  }
  function dateShift(base,days){const d=new Date(base+'T00:00:00');d.setDate(d.getDate()+days);return isoDate(d)}
  function milkPeriodFromQuestion(q){
-   const t=q.toLowerCase();
-   const end=t.includes('yesterday')?dateShift(today(),-1):today();
-   if(t.includes('yesterday'))return {start:end,end,label:'yesterday'};
-   if(/(30\s*day|1\s*month|monthly|month)/.test(t))return {start:dateShift(end,-29),end,label:'last 30 days'};
-   if(/(15\s*day)/.test(t))return {start:dateShift(end,-14),end,label:'last 15 days'};
-   if(/(60\s*day|2\s*month)/.test(t))return {start:dateShift(end,-59),end,label:'last 60 days'};
-   if(/(90\s*day|3\s*month)/.test(t))return {start:dateShift(end,-89),end,label:'last 90 days'};
-   if(/(7\s*day|week|weekly)/.test(t))return {start:dateShift(end,-6),end,label:'last 7 days'};
-   return {start:end,end,label:'today'};
- }
- function cowMilkAnswer(cow,q){
-   const p=milkPeriodFromQuestion(q),rows=milkRowsForCow(cow.id,p.start,p.end),agg=aggregateMilk(rows);
-   const name=cow.name||cow.id,tag=cow.tag?` (${cow.tag})`:'';
-   if(!rows.length)return `${name}${tag}\n• No milk record found for ${p.label} (${p.start} to ${p.end}).\n• I cannot calculate a yield or average without a recorded milk entry for this period.`;
-   const byDate={};rows.forEach(x=>{byDate[x.date]=(byDate[x.date]||0)+Number(x.total||0)});
-   const dates=[];for(let d=new Date(p.start+'T00:00:00');isoDate(d)<=p.end;d.setDate(d.getDate()+1))dates.push(isoDate(d));
-   const recordedDays=Object.keys(byDate).length,avg=agg.total/Math.max(1,dates.length);
-   const peak=Math.max(...dates.map(d=>byDate[d]||0)),peakDate=dates[dates.findIndex(d=>(byDate[d]||0)===peak)];
-   if(p.start===p.end)return `${name}${tag}\n• Date: ${p.end}\n• Morning: ${agg.morning.toFixed(1)} L\n• Afternoon: ${agg.afternoon.toFixed(1)} L\n• Evening: ${agg.evening.toFixed(1)} L\n• Total: ${agg.total.toFixed(1)} L\n\nExact recorded production for this cow on ${p.end}.`;
-   return `${name}${tag}\n• Period: ${p.start} to ${p.end}\n• Total: ${agg.total.toFixed(1)} L\n• Average: ${avg.toFixed(1)} L/day\n• Recorded days: ${recordedDays}/${dates.length}\n• Peak: ${peak.toFixed(1)} L on ${peakDate}\n• Morning total: ${agg.morning.toFixed(1)} L\n• Afternoon total: ${agg.afternoon.toFixed(1)} L\n• Evening total: ${agg.evening.toFixed(1)} L`;
- }
- function todayCowMilkRanking(lowFirst){
-   const todayRows=data.milk.filter(x=>x.date===today());
-   const byCow={};todayRows.forEach(x=>{const id=x.cowId;if(!id)return;if(!byCow[id])byCow[id]={total:0,morning:0,afternoon:0,evening:0};byCow[id].total+=Number(x.total||0);byCow[id].morning+=Number(x.morning||0);byCow[id].afternoon+=Number(x.afternoon||0);byCow[id].evening+=Number(x.evening||0)});
-   const ranked=Object.entries(byCow).map(([id,v])=>({id,...v,name:cowName(id)})).sort((a,b)=>lowFirst?a.total-b.total:b.total-a.total);
-   return ranked;
- }
- function periodCowMilkRanking(lowFirst,start,end){
-   const rows=data.milk.filter(x=>x.date>=start&&x.date<=end&&x.cowId);
-   const byCow={};
-   rows.forEach(x=>{const id=x.cowId;if(!byCow[id])byCow[id]={total:0,days:new Set()};byCow[id].total+=Number(x.total||0);byCow[id].days.add(x.date)});
-   return Object.entries(byCow).map(([id,v])=>({id,name:cowName(id),total:v.total,days:v.days.size})).sort((a,b)=>lowFirst?a.total-b.total:b.total-a.total);
- }
- function answerRaw(q){
-   let t=(q||'').toLowerCase().trim();
-   const tamilOrTanglish={
-     cow:/(மாடு|பசு|maadu|madu|pasu|cow|cows|animal|animals)/,
-     milk:/(பால்|paal|pal|milk|litre|liter|litres|liters|yield|production)/,
-     highest:/(அதிக|உயர|சிறந்த|adhiga|athiga|uyar|sirandha|highest|high|best|top|most|max|maximum)/,
-     lowest:/(குறை|குறைந்த|kurai|kuraindha|lowest|low|minimum|underperform|underperforming|poor)/,
-     overview:/(சுருக்க|நிலவர|எப்படி உள்ளது|surukk|nilavaram|eppadi|overview|summary|status)/,
-     health:/(சுகாதார|தடுப்பூசி|மருத்துவ|sugathar|sugaathar|thadup|maruthuv|health|vaccine|medical|treatment)/,
-     finance:/(வருமான|செலவு|லாப|கணக்கு|varuman|selavu|laab|labam|kanakku|finance|profit|income|expense|money|revenue)/,
-     inventory:/(தீவன|இருப்பு|ஸ்டாக்|theevan|thivan|iruppu|stock|feed|inventory|supply)/,
-     breeding:/(இனப்பெருக்க|கன்று|கர்ப்ப|inapperukk|kanru|karp|breed|calv|pregnan)/};
-   Object.entries(tamilOrTanglish).forEach(([word,pattern])=>{if(pattern.test(t))t+=' '+word});
-   const s=snapshot(),fmt=n=>Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:1});
-   const cow=findCowInQuestion(q);
-
-   if(/(hello|^hi\b|help|what can)/.test(t))return 'I give answers only from the records stored in this portal. Ask for a specific cow, today’s milk, 7-day production, highest/lowest recorded cow, health due dates, finance, breeding or inventory.';
-
-   // Specific cow queries must be answered before generic farm-level milk rules.
-   if(cow&&tamilOrTanglish.milk.test(t))return cowMilkAnswer(cow,q);
-
-   // Explicit highest/lowest cow questions. "Low yield" is reported as lowest recorded yield,
-   // not as a guessed biological threshold.
-   if(tamilOrTanglish.cow.test(t)&&tamilOrTanglish.lowest.test(t)&&tamilOrTanglish.milk.test(t)){
-     const ranked=todayCowMilkRanking(true);
-     if(!ranked.length)return `No milk records are available for ${s.day}, so I cannot identify a low-yield cow.`;
-     const top=ranked.slice(0,5),noRecord=s.active.filter(c=>c.status==='Lactating'&&!ranked.some(r=>r.id===c.id));
-     return `Lowest recorded milk producers today (${s.day})\n${top.map((r,i)=>`• ${i+1}. ${r.name} — ${r.total.toFixed(1)} L (AM ${r.morning.toFixed(1)} · Afternoon ${r.afternoon.toFixed(1)} · PM ${r.evening.toFixed(1)})`).join('\n')}\n\n${noRecord.length?`• ${noRecord.length} lactating cow(s) have no milk record today: ${noRecord.slice(0,8).map(c=>c.name||c.id).join(', ')}.`:'All active lactating cows have a milk record today.'}\n\nNote: “low yield” here means the lowest recorded production today; no arbitrary litre threshold is assumed.`;
-   }
-   if(tamilOrTanglish.cow.test(t)&&tamilOrTanglish.highest.test(t)&&tamilOrTanglish.milk.test(t)){
-     const ranked=todayCowMilkRanking(false);
-     if(!ranked.length)return `No milk records are available for ${s.day}, so I cannot identify today's highest-producing cow.`;
-     const top=ranked[0],runner=ranked[1];
-     return `Highest recorded milk producer today (${s.day})\n• ${top.name}\n• Total: ${top.total.toFixed(1)} L\n• Morning: ${top.morning.toFixed(1)} L\n• Afternoon: ${top.afternoon.toFixed(1)} L\n• Evening: ${top.evening.toFixed(1)} L${runner?`\n• Next: ${runner.name} — ${runner.total.toFixed(1)} L`:''}`;
-   }
-
-   if(/(overview|summary|status|need attention|attention|analyse|analyze)/.test(t)&&!tamilOrTanglish.milk.test(t))return `Farm overview for ${s.day}\n• Active animals: ${s.active.length}\n• Lactating: ${s.active.filter(c=>c.status==='Lactating').length}\n• Pregnant: ${s.active.filter(c=>c.status==='Pregnant').length}\n• Milk recorded today: ${fmt(s.milkToday)} L\n• Net recorded finance: ${moneyLocal(s.income-s.expense)}\n• Health items due within 7 days: ${s.due.length}\n• Inventory items at/below minimum: ${s.low.length}`;
-
-   if(tamilOrTanglish.milk.test(t)){
-     const last7=[],dates=[];for(let i=6;i>=0;i--){const ds=dateShift(today(),-i);dates.push(ds);last7.push(data.milk.filter(x=>x.date===ds).reduce((a,x)=>a+Number(x.total||0),0))}
-     const total7=last7.reduce((a,x)=>a+x,0),avg=total7/7,peak=Math.max(...last7),peakDate=dates[last7.indexOf(peak)],recordedDays=last7.filter(v=>v>0).length;
-     return `Milk production — farm total\n• Today (${s.day}): ${s.milkToday.toFixed(1)} L\n• Last 7 days total: ${total7.toFixed(1)} L\n• 7-day average: ${avg.toFixed(1)} L/day\n• Peak day: ${peak.toFixed(1)} L on ${peakDate}\n• Days with recorded production: ${recordedDays}/7\n• Cows with a milk record today: ${new Set(data.milk.filter(x=>x.date===s.day&&x.cowId).map(x=>x.cowId)).size}\n\nThese are recorded values only; the assistant does not assume feed or health causes unless the records support them.`;
-   }
-   if(/(finance|profit|income|expense|money|revenue|sale)/.test(t))return `Finance summary\n• Recorded income: ${moneyLocal(s.income)}\n• Recorded expenses: ${moneyLocal(s.expense)}\n• Net recorded balance: ${moneyLocal(s.income-s.expense)}\n• Transactions: ${data.finance.length}`;
-   if(/(health|vaccine|vaccination|alert|due|medical|treatment)/.test(t))return s.due.length?`Health attention needed\n${s.due.map(x=>`• ${cowName(x.cowId)} — ${x.type}, due ${x.nextDue}`).join('\n')}\n\nTotal due within 7 days: ${s.due.length}.`:`Health status\n• No vaccination or health follow-up is due within the next 7 days.\n• Total health/care records: ${data.health.length}.`;
-   if(/(breed|breeding|calv|pregnan)/.test(t)){const positives=data.breeding.filter(x=>/positive|success/i.test(x.result||'')).length;return `Breeding & calving\n• Total events: ${data.breeding.length}\n• Positive/successful results: ${positives}\n• Currently pregnant: ${s.active.filter(c=>c.status==='Pregnant').length}\n• Records with expected calving date: ${data.breeding.filter(x=>x.calving).length}`;}
-   if(/(inventory|feed|stock|supply)/.test(t))return s.low.length?`Inventory below/minimum stock\n${s.low.map(x=>`• ${x.name}: ${x.stock} ${x.unit} remaining; minimum ${x.minStock}`).join('\n')}\n\nItems needing replenishment: ${s.low.length}.`:`Inventory status\n• Recorded items: ${data.inventory.length}\n• All recorded items are above their minimum stock levels.`;
-   if(/(cow|herd|animal|lactat)/.test(t))return `Herd summary\n• Active animals: ${s.active.length}\n• Lactating: ${s.active.filter(c=>c.status==='Lactating').length}\n• Pregnant: ${s.active.filter(c=>c.status==='Pregnant').length}\n• Dry: ${s.active.filter(c=>c.status==='Dry').length}\n• Calves: ${s.active.filter(c=>c.status==='Calf').length}`;
-   return 'I can answer from the recorded portal data. Try “Lakshmi milk today”, “KM001 last 7 days”, “lowest milk cows today”, “highest milk cow today”, “milk production”, or “health due”.';
- }
- function assistantLanguage(q){
-   const x=(q||'').trim();
-   if(/[\u0B80-\u0BFF]/.test(x))return 'ta';
-   if(/\b(naan|neenga|unga|enaku|enakku|epdi|eppadi|enna|evlo|ethana|irukku|irukka|venum|vendum|paal|maadu|pasu|kanakku|theevanam|maruthuvam|kanru|indru|netru|naalai|innaiku|indha|andha|yen|eppodhu|solunga|sollunga|paakanum|kudunga|kidaikuma)\b/i.test(x))return 'tl';
-   return 'en';
- }
- const assistantTamilMap=[
-   ['I give answers only from the records stored in this portal.','இந்த போர்ட்டலில் பதிவு செய்யப்பட்ட தரவின் அடிப்படையில் நான் பதிலளிக்கிறேன்.'],
-   ['Ask for a specific cow, today’s milk, 7-day production, highest/lowest recorded cow, health due dates, finance, breeding or inventory.','குறிப்பிட்ட மாடு, இன்றைய பால், 7 நாள் பால் உற்பத்தி, அதிகம்/குறைந்த பதிவு, சுகாதார due தேதி, நிதி, இனப்பெருக்கம் அல்லது இருப்பு பற்றி கேட்கலாம்.'],
-   ['Farm overview','பண்ணை நிலவரம்'],['Active animals','செயலில் உள்ள மாடுகள்'],['Lactating','பால் தரும் மாடுகள்'],['Pregnant','கர்ப்பமான மாடுகள்'],['Dry','காய்ந்த மாடுகள்'],['Calves','கன்றுகள்'],
-   ['Milk recorded today','இன்று பதிவு செய்யப்பட்ட பால்'],['Health items due within 7 days','அடுத்த 7 நாட்களில் வரவுள்ள சுகாதார பணிகள்'],['Inventory items at/below minimum','குறைந்தபட்ச அளவில்/அதற்குக் கீழே உள்ள இருப்புகள்'],['Net recorded finance','பதிவு செய்யப்பட்ட நிகர நிதி'],
-   ['Milk production','பால் உற்பத்தி'],['Total','மொத்தம்'],['Average','சராசரி'],['Recorded days','பதிவு செய்யப்பட்ட நாட்கள்'],['Peak','அதிகபட்சம்'],['Morning','காலை'],['Afternoon','மதியம்'],['Evening','மாலை'],
-   ['Health attention needed','சுகாதார கவனம் தேவை'],['Health status','சுகாதார நிலை'],['Breeding & calving','இனப்பெருக்கம் & கன்று ஈனுதல்'],['Inventory status','இருப்பு நிலை'],['Finance','நிதி'],['Herd summary','மந்தை சுருக்கம்'],
-   ['No milk records are available','பால் பதிவு எதுவும் இல்லை'],['No milk record found for','பால் பதிவு கிடைக்கவில்லை:'],['No vaccination or health follow-up is due within the next 7 days.','அடுத்த 7 நாட்களில் தடுப்பூசி அல்லது சுகாதார follow-up எதுவும் due இல்லை.'],['All recorded items are above their minimum stock levels.','பதிவு செய்யப்பட்ட அனைத்து இருப்புகளும் குறைந்தபட்ச அளவை விட அதிகமாக உள்ளன.'],
-   ['Income','வருமானம்'],['Expenses','செலவுகள்'],['Net','நிகர தொகை'],['Transactions','பரிவர்த்தனைகள்'],['Total events','மொத்த நிகழ்வுகள்'],['Currently pregnant','தற்போது கர்ப்பமானவை'],['Items needing replenishment','மீண்டும் நிரப்ப வேண்டிய பொருட்கள்'],['Records','பதிவுகள்'],
-   ['today','இன்று'],['last 7 days','கடந்த 7 நாட்கள்'],['No milk record','பால் பதிவு இல்லை'],['I can answer from the recorded portal data.','போர்ட்டலில் பதிவு செய்யப்பட்ட தரவிலிருந்து நான் பதிலளிக்க முடியும்.']
- ];
- const assistantTanglishMap=[
-   ['I give answers only from the records stored in this portal.','Indha portal-la recorded data base panni naan answer panren.'],
-   ['Ask for a specific cow, today’s milk, 7-day production, highest/lowest recorded cow, health due dates, finance, breeding or inventory.','Specific maadu, innaiku paal, 7-day production, highest/lowest recorded maadu, health due date, finance, breeding illa inventory pathi kelunga.'],
-   ['Farm overview','Farm nilavaram'],['Active animals','Active maadugal'],['Lactating','Paal tharum maadugal'],['Pregnant','Pregnant maadugal'],['Dry','Dry maadugal'],['Calves','Kanrugal'],['Milk recorded today','Innaiku recorded paal'],['Health items due within 7 days','Adutha 7 naal-la due aagura health items'],['Inventory items at/below minimum','Minimum level-ku keela irukkura inventory'],['Net recorded finance','Recorded net finance'],['Milk production','Paal production'],['Total','Total'],['Average','Average'],['Recorded days','Recorded days'],['Peak','Peak'],['Morning','Morning'],['Afternoon','Afternoon'],['Evening','Evening'],['Health attention needed','Health attention thevai'],['Health status','Health status'],['Breeding & calving','Breeding & calving'],['Inventory status','Inventory status'],['Finance','Finance'],['Herd summary','Herd summary'],['No milk records are available','Milk record illa'],['No milk record found for','Milk record kidaikala:'],['No vaccination or health follow-up is due within the next 7 days.','Adutha 7 naal-la vaccination illa health follow-up due illa.'],['All recorded items are above their minimum stock levels.','Recorded inventory ellam minimum stock level-ku mela irukku.'],['Income','Income'],['Expenses','Expenses'],['Net','Net'],['Transactions','Transactions'],['Total events','Total events'],['Currently pregnant','Currently pregnant'],['Items needing replenishment','Refill panna vendiya items'],['Records','Records'],['today','innaiku'],['last 7 days','last 7 days']
- ];
- function localizeAssistant(text,lang){
-   if(lang==='en')return text;
-   const list=lang==='ta'?assistantTamilMap:assistantTanglishMap;
-   let out=String(text||'');
-   list.forEach(([a,b])=>{out=out.split(a).join(b)});
-   return out;
- }
- function getSelectedAssistantLanguage(){
-   const el=document.getElementById('assistantLang');
-   const v=el&&el.value;
-   if(v==='ta-IN')return 'ta';
-   if(v==='tl-IN')return 'tl';
-   if(v==='en-IN')return 'en';
-   return null; // Auto
- }
- function assistantResponseLanguage(q){
-   return getSelectedAssistantLanguage() || assistantLanguage(q);
- }
- function localizedCowMilkAnswer(cow,q,lang){
-   const p=milkPeriodFromQuestion(q),rows=milkRowsForCow(cow.id,p.start,p.end),agg=aggregateMilk(rows);
-   const name=cow.name||cow.id,tag=cow.tag?` (${cow.tag})`:'';
-   if(!rows.length){
-     if(lang==='ta')return `${name}${tag}\n• ${p.label} (${p.start} முதல் ${p.end} வரை) பால் பதிவு கிடைக்கவில்லை.\n• பதிவு இல்லாததால் பால் உற்பத்தி/சராசரியை கணக்கிட முடியவில்லை.`;
-     if(lang==='tl')return `${name}${tag}\n• ${p.label} (${p.start} to ${p.end})-ku milk record kidaikala.\n• Record illa, athanala milk production/average calculate panna mudiyala.`;
-     return `${name}${tag}\n• No milk record found for ${p.label} (${p.start} to ${p.end}).\n• I cannot calculate yield or average without a recorded milk entry.`;
-   }
-   const byDate={};rows.forEach(x=>{byDate[x.date]=(byDate[x.date]||0)+Number(x.total||0)});
-   const dates=[];for(let d=new Date(p.start+'T00:00:00');isoDate(d)<=p.end;d.setDate(d.getDate()+1))dates.push(isoDate(d));
-   const recordedDays=Object.keys(byDate).length,avg=agg.total/Math.max(1,dates.length);
-   const peak=Math.max(...dates.map(d=>byDate[d]||0)),peakDate=dates[dates.findIndex(d=>(byDate[d]||0)===peak)];
-   if(p.start===p.end){
-     if(lang==='ta')return `${name}${tag}\n• தேதி: ${p.end}\n• காலை: ${agg.morning.toFixed(1)} லிட்டர்\n• மதியம்: ${agg.afternoon.toFixed(1)} லிட்டர்\n• மாலை: ${agg.evening.toFixed(1)} லிட்டர்\n• மொத்தம்: ${agg.total.toFixed(1)} லிட்டர்`;
-     if(lang==='tl')return `${name}${tag}\n• Date: ${p.end}\n• Morning: ${agg.morning.toFixed(1)} L\n• Afternoon: ${agg.afternoon.toFixed(1)} L\n• Evening: ${agg.evening.toFixed(1)} L\n• Total: ${agg.total.toFixed(1)} L`;
-     return `${name}${tag}\n• Date: ${p.end}\n• Morning: ${agg.morning.toFixed(1)} L\n• Afternoon: ${agg.afternoon.toFixed(1)} L\n• Evening: ${agg.evening.toFixed(1)} L\n• Total: ${agg.total.toFixed(1)} L`;
-   }
-   if(lang==='ta')return `${name}${tag}\n• காலம்: ${p.label}\n• மொத்தம்: ${agg.total.toFixed(1)} லிட்டர்\n• சராசரி: ${avg.toFixed(1)} லிட்டர்/நாள்\n• பதிவு செய்யப்பட்ட நாட்கள்: ${recordedDays}/${dates.length}\n• அதிகபட்ச நாள்: ${peak.toFixed(1)} லிட்டர் — ${peakDate}`;
-   if(lang==='tl')return `${name}${tag}\n• Period: ${p.label}\n• Total: ${agg.total.toFixed(1)} L\n• Average: ${avg.toFixed(1)} L/day\n• Recorded days: ${recordedDays}/${dates.length}\n• Highest day: ${peak.toFixed(1)} L — ${peakDate}`;
-   return `${name}${tag}\n• Period: ${p.label}\n• Total: ${agg.total.toFixed(1)} L\n• Average: ${avg.toFixed(1)} L/day\n• Recorded days: ${recordedDays}/${dates.length}\n• Peak day: ${peak.toFixed(1)} L — ${peakDate}`;
- }
- function answer(q,forcedLang){
-   const lang=forcedLang||assistantResponseLanguage(q);
-   const lower=(q||'').toLowerCase().trim();
-   const norm=lower.replace(/[?!.，。！？]/g,' ');
-   const milkRx=/(milk|yield|production|பால்|paal|pal|லிட்டர்|litre|liter)/i;
-   const lowRx=/(lowest|low|least|minimum|poorest|underperform|under performing|குறைந்த|குறைவு|குறைவான|குறைந்தது|குறைவாக|kurai|kuraindha|kuraivu|kuraivana|kuraiva|kammi|kammiya)/i;
-   const highRx=/(highest|high|top|best|maximum|most|அதிக|அதிகம்|அதிகமான|மிகவும்|adhiga|adhigama|uyarntha|uyar|nalla)/i;
-
-   try{
-     // Always answer the selected language. Auto mode follows the user's input language.
-     if(/^(keywords|keyword|commands|command|help keywords|keywords list|கீவேர்ட்ஸ்|கீவேர்ட்|கட்டளைகள்|கட்டளை)$/i.test(norm.trim())){
-       if(lang==='ta')return `Farm Assistant — Keywords / கேள்விகள்\n\nபால்:\n• இன்றைய மொத்த பால்\n• குறைந்த பால் தரும் மாடுகள்\n• அதிக பால் தரும் மாடு\n• கடந்த 7 நாட்கள் பால் உற்பத்தி\n• கடந்த 1 வாரத்தில் அதிக பால் தரும் மாடு\n• கடந்த 1 வாரத்தில் குறைந்த பால் தரும் மாடு\n• [மாடு பெயர்] இன்று எவ்வளவு பால்?\n• [மாடு பெயர்] கடந்த 7 நாட்கள் பால்\n\nபண்ணை / மாடுகள்:\n• பண்ணை நிலவரம்\n• மொத்த மாடுகள்\n• பால் தரும் மாடுகள்\n• கர்ப்பமான மாடுகள்\n• கன்றுகள்\n\nசுகாதாரம்:\n• health due / சுகாதார due\n• அடுத்த 7 நாட்களில் health வேலை\n• தடுப்பூசி நிலவரம்\n\nஇனப்பெருக்கம்:\n• breeding நிலவரம்\n• calving / கன்று ஈனுதல் நிலவரம்\n\nதீவனம் / இருப்பு:\n• feed stock\n• low stock\n• inventory status\n\nநிதி:\n• income\n• expense\n• profit / net balance\n• finance summary\n\nPortal:\n• portal எப்படி வேலை செய்கிறது?\n• milk chart என்ன காட்டுகிறது?\n• reports எப்படி பார்க்கலாம்?\n• என்ன records உள்ளன?`;
-       if(lang==='tl')return `Farm Assistant — Keywords / commands\n\nMilk:\n• innaiku total milk evlo?\n• kammiya paal kudukkura maadugal yethu?\n• adhiga paal kudukkura maadu yethu?\n• last 7 days milk production\n• last 1 week-la highest milk kudukkura maadu yethu?\n• last 1 week-la lowest milk kudukkura maadu yethu?\n• [maadu name] innaiku milk evlo?\n• [maadu name] last 7 days milk\n\nFarm / Cows:\n• farm nilavaram\n• total maadugal\n• paal tharum maadugal\n• pregnant maadugal\n• kanrugal\n\nHealth:\n• health due enna?\n• next 7 days health work\n• vaccination status\n\nBreeding:\n• breeding nilavaram\n• calving nilavaram\n\nFeed / Inventory:\n• feed stock\n• low stock yethu?\n• inventory status\n\nFinance:\n• income\n• expense\n• profit / net balance\n• finance summary\n\nPortal:\n• indha portal eppadi work aaguthu?\n• milk chart enna kaamikuthu?\n• reports eppadi paakarthu?\n• enna records irukku?`;
-       return `Farm Assistant keywords / commands\n\nMilk:\n• today's total milk\n• lowest milk cows\n• highest milk cow\n• last 7 days milk production\n• highest milk-producing cow in the last 1 week\n• lowest milk-producing cow in the last 1 week\n• [cow name] milk today\n• [cow name] milk last 7 days\n\nFarm / cows:\n• farm overview\n• total cows\n• lactating cows\n• pregnant cows\n• calves\n\nHealth:\n• health due\n• health work due in next 7 days\n• vaccination status\n\nBreeding:\n• breeding status\n• calving status\n\nFeed / inventory:\n• feed stock\n• low stock\n• inventory status\n\nFinance:\n• income\n• expenses\n• profit / net balance\n• finance summary\n\nPortal:\n• how does this portal work?\n• what does the milk chart show?\n• how to view reports?\n• what records are available?`;
-     }
-     const hasPeriod=/\b(last|past|previous)\s*(1\s*)?(day|days|week|weeks|month|months)\b|\b7[- ]?day|\bweekly\b|கடந்த\s*(7|ஒரு)\s*(நாள்|நாட்கள்|வாரம்)|முந்தைய\s*வாரம்/i.test(norm);
-     const asksLowestMilk=lowRx.test(norm)&&milkRx.test(norm);
-     const asksHighestMilk=highRx.test(norm)&&milkRx.test(norm);
-     if((asksLowestMilk||asksHighestMilk)&&hasPeriod){
-       const end=today(),start=dateShift(end,-6),ranked=periodCowMilkRanking(asksLowestMilk,start,end);
-       if(!ranked.length)return lang==='ta'?`கடந்த 7 நாட்களில் மாடு வாரியான பால் பதிவு இல்லை.`:lang==='tl'?`Last 7 days-la cow-wise milk record illa.`:`There are no cow-wise milk records for the last 7 days.`;
-       const top=ranked.slice(0,5);
-       if(lang==='ta')return `${asksLowestMilk?'கடந்த 7 நாட்களில் குறைந்த':'கடந்த 7 நாட்களில் அதிக'} மொத்த பால் உற்பத்தி மாடுகள்\n${top.map((r,i)=>`• ${i+1}. ${r.name} — ${r.total.toFixed(1)} லிட்டர் (${r.days} நாட்கள் பதிவு)`).join('\n')}`;
-       if(lang==='tl')return `Last 7 days-la ${asksLowestMilk?'lowest':'highest'} overall milk production maadugal\n${top.map((r,i)=>`• ${i+1}. ${r.name} — ${r.total.toFixed(1)} L (${r.days} days record)`).join('\n')}`;
-       return `${asksLowestMilk?'Lowest':'Highest'} overall milk-producing cows in the last 7 days\n${top.map((r,i)=>`• ${i+1}. ${r.name} — ${r.total.toFixed(1)} L (${r.days} recorded days)`).join('\n')}`;
-     }
-     if((asksLowestMilk||asksHighestMilk)&&!hasPeriod){
-       const ranked=todayCowMilkRanking(asksLowestMilk),s=snapshot();
-       if(!ranked.length){
-         if(lang==='ta')return `இன்று (${s.day}) பால் பதிவு இல்லை. அதனால் ${asksLowestMilk?'குறைந்த':'அதிக'} பால் தரும் மாட்டை கண்டறிய முடியவில்லை.`;
-         if(lang==='tl')return `Innaiku (${s.day}) milk record illa. Athanala ${asksLowestMilk?'lowest':'highest'} milk kudukkura maatta identify panna mudiyala.`;
-         return `There are no milk records for today (${s.day}), so I cannot identify the ${asksLowestMilk?'lowest':'highest'} milk producer.`;
-       }
-       if(asksLowestMilk){
-         const top=ranked.slice(0,5),noRecord=s.active.filter(c=>c.status==='Lactating'&&!ranked.some(r=>r.id===c.id));
-         if(lang==='ta')return `இன்றைய குறைந்த பால் உற்பத்தி மாடுகள் (${s.day})\n${top.map((r,i)=>`• ${i+1}. ${r.name} — ${r.total.toFixed(1)} லிட்டர் (காலை ${r.morning.toFixed(1)} · மதியம் ${r.afternoon.toFixed(1)} · மாலை ${r.evening.toFixed(1)})`).join('\n')}\n\n${noRecord.length?`• ${noRecord.length} பால் தரும் மாடுகளுக்கு இன்று பதிவு இல்லை: ${noRecord.slice(0,8).map(c=>c.name||c.id).join(', ')}.`:'அனைத்து பால் தரும் மாடுகளுக்கும் இன்று பதிவு உள்ளது.'}`;
-         if(lang==='tl')return `Innaiku lowest milk production (${s.day})\n${top.map((r,i)=>`• ${i+1}. ${r.name} — ${r.total.toFixed(1)} L (Morning ${r.morning.toFixed(1)} · Afternoon ${r.afternoon.toFixed(1)} · Evening ${r.evening.toFixed(1)})`).join('\n')}\n\n${noRecord.length?`• ${noRecord.length} lactating maadukku innaiku milk record illa: ${noRecord.slice(0,8).map(c=>c.name||c.id).join(', ')}.`:'Ella lactating maadukkum innaiku milk record irukku.'}`;
-         return `Lowest recorded milk producers today (${s.day})\n${top.map((r,i)=>`• ${i+1}. ${r.name} — ${r.total.toFixed(1)} L (AM ${r.morning.toFixed(1)} · Afternoon ${r.afternoon.toFixed(1)} · PM ${r.evening.toFixed(1)})`).join('\n')}\n\n${noRecord.length?`• ${noRecord.length} lactating cow(s) have no milk record today: ${noRecord.slice(0,8).map(c=>c.name||c.id).join(', ')}.`:'All active lactating cows have a milk record today.'}`;
-       }
-       const top=ranked[0],runner=ranked[1];
-       if(lang==='ta')return `இன்றைய அதிக பால் உற்பத்தி மாடு (${s.day})\n• ${top.name}\n• மொத்தம்: ${top.total.toFixed(1)} லிட்டர்\n• காலை: ${top.morning.toFixed(1)} லிட்டர்\n• மதியம்: ${top.afternoon.toFixed(1)} லிட்டர்\n• மாலை: ${top.evening.toFixed(1)} லிட்டர்${runner?`\n• அடுத்தது: ${runner.name} — ${runner.total.toFixed(1)} லிட்டர்`:''}`;
-       if(lang==='tl')return `Innaiku highest milk production (${s.day})\n• ${top.name}\n• Total: ${top.total.toFixed(1)} L\n• Morning: ${top.morning.toFixed(1)} L\n• Afternoon: ${top.afternoon.toFixed(1)} L\n• Evening: ${top.evening.toFixed(1)} L${runner?`\n• Next: ${runner.name} — ${runner.total.toFixed(1)} L`:''}`;
-       return `Highest recorded milk producer today (${s.day})\n• ${top.name}\n• Total: ${top.total.toFixed(1)} L\n• Morning: ${top.morning.toFixed(1)} L\n• Afternoon: ${top.afternoon.toFixed(1)} L\n• Evening: ${top.evening.toFixed(1)} L${runner?`\n• Next: ${runner.name} — ${runner.total.toFixed(1)} L`:''}`;
-     }
-
-     const cow=findCowInQuestion(q);
-     if(cow&&milkRx.test(norm))return localizedCowMilkAnswer(cow,q,lang);
-
-     // For the remaining portal intents, use the existing data engine and localize its response.
-     const raw=answerRaw(q);
-     if(/^(I can answer from the recorded portal data\.|You can ask naturally about|I give answers only from the records)/.test(raw)){
-       if(/(how|எப்படி|பயன்படுத்த|use|feature|வசதி|button|click|work|eppadi|epdi)/i.test(lower)){
-         return lang==='ta'?'இந்த portal-ல் Dashboard, Cows, Milk Production, Health & Vaccination, Breeding & Calving, Finance, Feed & Inventory, Reports, Backup மற்றும் Settings பகுதிகள் உள்ளன. எந்த feature பற்றியும் எப்படி பயன்படுத்துவது, என்ன பதிவு செய்ய வேண்டும், அல்லது chart என்ன காட்டுகிறது என்று கேட்கலாம்.':lang==='tl'?'Indha portal-la Dashboard, Cows, Milk Production, Health & Vaccination, Breeding & Calving, Finance, Feed & Inventory, Reports, Backup, Settings sections irukku. Endha feature pathiyum eppadi use panrathu, enna record pannanum, illa chart enna kaamikudhu-nu kelunga.':'This portal includes Dashboard, Cows, Milk Production, Health & Vaccination, Breeding & Calving, Finance, Feed & Inventory, Reports, Backup, and Settings. Ask how to use a feature, what to record, or what a chart means.';
-       }
-       return lang==='ta'?'இந்த portal-ல் உள்ள மாடுகள், பால் உற்பத்தி, சுகாதாரம், இனப்பெருக்கம், தீவனம்/இருப்பு, நிதி, reports, charts, records மற்றும் தேதிகள் பற்றி கேட்கலாம்.':lang==='tl'?'Indha portal-la maadugal, paal production, health, breeding, theevanam/inventory, finance, reports, charts, records, dates pathi natural-a kelunga.':'You can ask naturally about cows, milk production, health, breeding, feed/inventory, finance, reports, charts, records, dates, summaries, and portal features.';
-     }
-     return localizeAssistant(raw,lang);
-   }catch(err){
-     console.error('Farm Assistant error:',err);
-     if(lang==='ta')return 'மன்னிக்கவும். இந்த கேள்விக்கான பதிலை உருவாக்கும்போது பிழை ஏற்பட்டது. கேள்வியை சுருக்கமாக மீண்டும் கேளுங்கள்.';
-     if(lang==='tl')return 'Sorry. Indha question-ku answer generate pannumbodhu error vandhudhu. Konjam short-a marubadi kelunga.';
-     return 'Sorry, I could not generate the answer. Please try the question again.';
-   }
- }
- function ask(text,spoken){
-   const q=(text||'').trim();
-   if(!q)return;
-   add(q,'user');
-   input.value='';
-   const forced=getSelectedAssistantLanguage();
-   const response=answer(q,forced);
-   add(response,'bot');
-   if(spoken&&'speechSynthesis'in window){
-     speechSynthesis.cancel();
-     const u=new SpeechSynthesisUtterance(response.replace(/[•\n]/g,' '));
-     const outLang=forced||assistantLanguage(q);
-     u.lang=outLang==='ta'||outLang==='tl'?'ta-IN':'en-IN';
-     speechSynthesis.speak(u);
-   }
- }
- $('assistantLaunch').onclick=()=>{panel.classList.toggle('show');if(panel.classList.contains('show'))input.focus()};$('assistantClose').onclick=()=>panel.classList.remove('show');$('assistantForm').onsubmit=e=>{e.preventDefault();ask(input.value)};document.querySelectorAll('.assistant-suggestions button').forEach(b=>b.onclick=()=>ask(b.textContent));
- const Recognizer=window.SpeechRecognition||window.webkitSpeechRecognition;if(Recognizer){const rec=new Recognizer();rec.lang='en-IN';rec.interimResults=false;rec.onstart=()=>{voice.classList.add('listening');voice.textContent='●'};rec.onend=()=>{voice.classList.remove('listening');voice.textContent='🎙'};rec.onerror=()=>add('I could not hear that. Please try again or type your question.','bot');rec.onresult=e=>{const said=e.results[0][0].transcript;input.value=said;ask(said,true)};voice.onclick=()=>{const lv=$('assistantLang')?.value||'auto';rec.lang=lv==='ta-IN'?'ta-IN':lv==='tl-IN'?'ta-IN':'en-IN';try{rec.start()}catch(e){}}}else{voice.onclick=()=>add('Voice input is not supported in this browser. You can still type your question.','bot');voice.title='Voice input is not supported in this browser'}
- add('Hello — I’m your Farm Assistant. Ask in English, தமிழ், or Tanglish. I can answer questions about this portal and its recorded farm data.','bot');
+  const t=String(q||'').toLowerCase().trim();
+  const todayDate=today();
+  const make=(start,end,label,kind='rolling')=>({start,end,label,kind});
+  if(/\b(yesterday|நேற்று)\b/.test(t)){
+    const d=dateShift(todayDate,-1);return make(d,d,'yesterday','single');
+  }
+  if(/\b(today|today's|todays|இன்று|indru)\b/.test(t))return make(todayDate,todayDate,'today','single');
+  // Explicit rolling ranges. "last week" is treated as the last 7 calendar days including today.
+  if(/\b(7\s*day|7\s*days|1\s*week|one\s*week|last\s*week|weekly|past\s*week|கடந்த\s*7\s*நாள்|கடந்த\s*ஒரு\s*வாரம்)\b/.test(t)){
+    return make(dateShift(todayDate,-6),todayDate,'last 7 days','rolling');
+  }
+  if(/\b(this\s*week|current\s*week)\b/.test(t)){
+    const d=new Date(todayDate+'T00:00:00');
+    const day=d.getDay();d.setDate(d.getDate()-(day===0?6:day-1));
+    return make(isoDate(d),todayDate,'this week','calendar');
+  }
+  if(/\b(15\s*day|15\s*days|half\s*month)\b/.test(t))return make(dateShift(todayDate,-14),todayDate,'last 15 days');
+  if(/\b(30\s*day|30\s*days|1\s*month|one\s*month|monthly|month)\b/.test(t))return make(dateShift(todayDate,-29),todayDate,'last 30 days');
+  if(/\b(60\s*day|60\s*days|2\s*month|two\s*month)\b/.test(t))return make(dateShift(todayDate,-59),todayDate,'last 60 days');
+  if(/\b(90\s*day|90\s*days|3\s*month|three\s*month|quarter)\b/.test(t))return make(dateShift(todayDate,-89),todayDate,'last 90 days');
+  const m=t.match(/\b(?:last|past|previous)\s+(\d+)\s*days?\b/);
+  if(m){const n=Math.max(1,Math.min(548,Number(m[1])));return make(dateShift(todayDate,-(n-1)),todayDate,`last ${n} days`);}
+  return make(todayDate,todayDate,'today','single');
+}
+function periodDates(period){
+  const out=[];for(let d=new Date(period.start+'T00:00:00');isoDate(d)<=period.end;d.setDate(d.getDate()+1))out.push(isoDate(d));return out;
+}
+function milkDailyTotals(period){
+  const dates=periodDates(period),byDate={};
+  dates.forEach(d=>byDate[d]=0);
+  data.milk.filter(x=>x.date>=period.start&&x.date<=period.end).forEach(x=>{byDate[x.date]=(byDate[x.date]||0)+Number(x.total||0)});
+  return {dates,byDate};
+}
+function cowMilkAnswer(cow,q){
+  const p=milkPeriodFromQuestion(q),rows=milkRowsForCow(cow.id,p.start,p.end),agg=aggregateMilk(rows);
+  const name=cow.name||cow.id,tag=cow.tag?` (${cow.tag})`:'';
+  if(!rows.length)return `${name}${tag}\n• No milk record found for ${p.label} (${p.start} to ${p.end}).\n• No yield or average is calculated because there is no recorded milk for this period.`;
+  const byDate={};rows.forEach(x=>{byDate[x.date]=(byDate[x.date]||0)+Number(x.total||0)});
+  const dates=periodDates(p),recordedDays=Object.keys(byDate).length,avg=agg.total/Math.max(1,dates.length);
+  const peak=Math.max(...dates.map(d=>byDate[d]||0)),peakDate=dates.find(d=>(byDate[d]||0)===peak);
+  if(p.start===p.end)return `${name}${tag}\n• Date: ${p.end}\n• Morning: ${agg.morning.toFixed(1)} L\n• Afternoon: ${agg.afternoon.toFixed(1)} L\n• Evening: ${agg.evening.toFixed(1)} L\n• Total: ${agg.total.toFixed(1)} L\n\nExact recorded production for this cow on ${p.end}.`;
+  return `${name}${tag}\n• Period: ${p.start} to ${p.end}\n• Total: ${agg.total.toFixed(1)} L\n• Average across the full period: ${avg.toFixed(1)} L/day\n• Recorded days: ${recordedDays}/${dates.length}\n• Peak recorded day: ${peak.toFixed(1)} L on ${peakDate}\n• Morning total: ${agg.morning.toFixed(1)} L\n• Afternoon total: ${agg.afternoon.toFixed(1)} L\n• Evening total: ${agg.evening.toFixed(1)} L`;
+}
+function cowMilkRanking(period,lowFirst){
+  const rows=data.milk.filter(x=>x.cowId&&x.date>=period.start&&x.date<=period.end);
+  const byCow={};rows.forEach(x=>{const id=x.cowId;if(!byCow[id])byCow[id]={total:0,morning:0,afternoon:0,evening:0,days:new Set()};byCow[id].total+=Number(x.total||0);byCow[id].morning+=Number(x.morning||0);byCow[id].afternoon+=Number(x.afternoon||0);byCow[id].evening+=Number(x.evening||0);byCow[id].days.add(x.date)});
+  const ranked=Object.entries(byCow).map(([id,v])=>({id,name:cowName(id),total:v.total,morning:v.morning,afternoon:v.afternoon,evening:v.evening,recordedDays:v.days.size,average:v.total/Math.max(1,v.days.size)}));
+  ranked.sort((a,b)=>lowFirst?(a.total-b.total||a.name.localeCompare(b.name)):(b.total-a.total||a.name.localeCompare(b.name)));
+  return ranked;
+}
+function farmProductionAnswer(period,lowFirst){
+  const {dates,byDate}=milkDailyTotals(period);
+  const recorded=dates.filter(d=>byDate[d]>0);
+  if(!recorded.length)return `No milk records are available for ${period.label} (${period.start} to ${period.end}).\n• I cannot calculate the ${lowFirst?'lowest':'highest'} production day from this period.`;
+  const sorted=recorded.slice().sort((a,b)=>lowFirst?(byDate[a]-byDate[b]||a.localeCompare(b)):(byDate[b]-byDate[a]||a.localeCompare(b)));
+  const first=sorted[0],second=sorted[1];
+  const total=recorded.reduce((s,d)=>s+byDate[d],0),avgRecorded=total/recorded.length,avgCalendar=total/dates.length;
+  return `${lowFirst?'Lowest':'Highest'} farm milk production day — ${period.label}\n• Date: ${first}\n• Farm total: ${byDate[first].toFixed(1)} L\n• Recorded production days: ${recorded.length}/${dates.length}\n• Total milk in period: ${total.toFixed(1)} L\n• Average on recorded days: ${avgRecorded.toFixed(1)} L/day\n• Average across all calendar days: ${avgCalendar.toFixed(1)} L/day${second?`\n• Next: ${second} — ${byDate[second].toFixed(1)} L`:''}\n\nOnly recorded milk is included. Days with no milk entry are not treated as 0 L when ranking the selected production day.`;
+}
+function normalizeAssistantText(q){
+  return String(q||'').toLowerCase().trim()
+    .replace(/[?!.;,]+/g,' ')
+    .replace(/\b(one|1)\s*(week|wk)\b/g,'7 days')
+    .replace(/\b(last|past)\s+(one|1)\s+week\b/g,'last 7 days')
+    .replace(/\b(last|past)\s+week\b/g,'last 7 days')
+    .replace(/\b(1|one)\s+week\b/g,'7 days')
+    .replace(/\b(overall|overall\s+milk|overall\s+production)\b/g,'overall production')
+    .replace(/\bprodution\b/g,'production')
+    .replace(/\blitre(s)?\b/g,'liter');
+}
+function assistantIntent(t){
+  return {
+    cow:/(மாடு|பசு|maadu|madu|pasu|cow|cows|animal|animals|producer|producers|performer|performers|producing\s*cow|producing\s*cows|yield\s*per\s*cow|cow\s*production)/i.test(t),
+    milk:/(பால்|paal|pal|milk|liter|liters|yield|production|prodution|producing\s*cow|producing\s*cows)/i.test(t),
+    wise:/(வாரியாக|ஒவ்வொரு|per\s*cow|each\s*cow|every\s*cow|all\s*cows|cow[\s-]*wise|cow\s*by\s*cow|breakdown)/i.test(t),
+    highest:/(அதிக|உயர|சிறந்த|adhiga|athiga|uyar|sirandha|highest|high|best|top|most|max|maximum)/i.test(t),
+    lowest:/(குறை|குறைந்த|kurai|kuraindha|lowest|low|minimum|underperform|underperforming|poor)/i.test(t),
+    overview:/(சுருக்க|நிலவர|எப்படி உள்ளது|surukk|nilavaram|eppadi|overview|summary|status|dashboard)/i.test(t),
+    health:/(சுகாதார|தடுப்பூசி|மருத்துவ|sugathar|sugaathar|thadup|maruthuv|health|vaccine|medical|treatment|due)/i.test(t),
+    finance:/(வருமான|செலவு|லாப|கணக்கு|varuman|selavu|laab|labam|kanakku|finance|profit|income|expense|money|revenue|sale)/i.test(t),
+    inventory:/(தீவன|இருப்பு|ஸ்டாக்|theevan|thivan|iruppu|stock|feed|inventory|supply)/i.test(t),
+    breeding:/(இனப்பெருக்க|கன்று|கர்ப்ப|inapperukk|kanru|karp|breed|calv|pregnan)/i.test(t)
+  };
+}
+function answer(q){
+  const original=String(q||'').trim(),t=normalizeAssistantText(original),i=assistantIntent(t);
+  const s=snapshot(),fmt=n=>Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:1}),cow=findCowInQuestion(original);
+  if(!original)return '';
+  if(/^(hello|hi|hey|help|what can you do)\b/i.test(t))return 'I answer only from the recorded portal data. Examples: “Lakshmi milk today”, “KM001 last 7 days”, “lowest milk cows today”, “lowest producing cow last 7 days”, “lowest overall production in last 7 days”, “highest overall production last 7 days”, “milk production”, “health due”, or “finance summary”.';
+  // Specific cow queries always take priority.
+  if(cow&&i.milk)return cowMilkAnswer(cow,original);
+  const p=milkPeriodFromQuestion(t);
+  // Explicit cow ranking: "lowest milk cows", "lowest producing cow", etc.
+  if(i.cow&&i.lowest&&i.milk){
+    const ranked=cowMilkRanking(p,true);
+    if(!ranked.length)return `No milk records are available for ${p.label} (${p.start} to ${p.end}).\n• I cannot identify the lowest-producing cow without recorded milk in this period.\n• Try “lowest producing cow last 7 days” when you want a 7-day comparison.`;
+    const top=ranked.slice(0,5),activeLact=s.active.filter(c=>c.status==='Lactating'),noRecord=activeLact.filter(c=>!ranked.some(r=>r.id===c.id));
+    return `Lowest recorded cow production — ${p.label} (${p.start} to ${p.end})\n${top.map((r,n)=>`• ${n+1}. ${r.name} — ${r.total.toFixed(1)} L total; ${r.recordedDays} recorded day(s); ${r.average.toFixed(1)} L/recorded day`).join('\n')}\n\n${noRecord.length?`• ${noRecord.length} lactating cow(s) have no milk record in this period: ${noRecord.slice(0,12).map(c=>c.name||c.id).join(', ')}.`:'• All active lactating cows have at least one milk record in this period.'}\n\nDefinition: “lowest” means the smallest recorded total for the selected period. No biological low-yield threshold is assumed.`;
+  }
+  if(i.cow&&i.highest&&i.milk){
+    const ranked=cowMilkRanking(p,false);
+    if(!ranked.length)return `No milk records are available for ${p.label} (${p.start} to ${p.end}), so I cannot identify the highest-producing cow.`;
+    const top=ranked[0],runner=ranked[1];
+    return `Highest recorded cow production — ${p.label} (${p.start} to ${p.end})\n• ${top.name}\n• Total: ${top.total.toFixed(1)} L\n• Recorded days: ${top.recordedDays}\n• Average per recorded day: ${top.average.toFixed(1)} L${runner?`\n• Next: ${runner.name} — ${runner.total.toFixed(1)} L`:''}`;
+  }
+  // "overall production" means farm-level daily production, not a cow ranking.
+  if(i.milk&&i.lowest&&/(overall\s+production|farm|day|daily|overall)/i.test(t))return farmProductionAnswer(p,true);
+  if(i.milk&&i.highest&&/(overall\s+production|farm|day|daily|overall)/i.test(t))return farmProductionAnswer(p,false);
+  if(i.milk&&i.wise){
+    const ranked=cowMilkRanking(p,false);
+    if(!ranked.length)return `No milk records are available for ${p.label} (${p.start} to ${p.end}), so I cannot show a cow-wise breakdown.`;
+    const totalAll=ranked.reduce((a,r)=>a+r.total,0);
+    return `Cow-wise milk — ${p.label} (${p.start} to ${p.end})\n${ranked.map((r,n)=>`• ${n+1}. ${r.name} — ${r.total.toFixed(1)} L`).join('\n')}\n\nTotal across ${ranked.length} cow(s) with a record: ${totalAll.toFixed(1)} L.`;
+  }
+  if(i.overview&&!i.milk)return `Farm overview for ${s.day}\n• Active animals: ${s.active.length}\n• Lactating: ${s.active.filter(c=>c.status==='Lactating').length}\n• Pregnant: ${s.active.filter(c=>c.status==='Pregnant').length}\n• Milk recorded today: ${s.milkToday.toFixed(1)} L\n• Net recorded finance: ${moneyLocal(s.income-s.expense)}\n• Health items due within 7 days: ${s.due.length}\n• Inventory items at/below minimum: ${s.low.length}`;
+  if(i.milk){
+    const totals=milkDailyTotals(p),dates=totals.dates,vals=dates.map(d=>totals.byDate[d]||0),recorded=vals.filter(v=>v>0),total=vals.reduce((a,b)=>a+b,0),avgCalendar=total/dates.length,peak=recorded.length?Math.max(...recorded):0,peakDate=recorded.length?dates[vals.indexOf(peak)]:null;
+    return `Milk production — farm total\n• Period: ${p.start} to ${p.end}\n• Total: ${total.toFixed(1)} L\n• Average across calendar days: ${avgCalendar.toFixed(1)} L/day\n• Peak recorded day: ${peak.toFixed(1)} L${peakDate?` on ${peakDate}`:''}\n• Days with recorded production: ${recorded.length}/${dates.length}\n• Cows with a milk record today: ${new Set(data.milk.filter(x=>x.date===s.day&&x.cowId).map(x=>x.cowId)).size}\n\nThese are recorded values only.`;
+  }
+  if(i.finance)return `Finance summary\n• Recorded income: ${moneyLocal(s.income)}\n• Recorded expenses: ${moneyLocal(s.expense)}\n• Net recorded balance: ${moneyLocal(s.income-s.expense)}\n• Transactions: ${data.finance.length}`;
+  if(i.health)return s.due.length?`Health attention needed\n${s.due.map(x=>`• ${cowName(x.cowId)} — ${x.type}, due ${x.nextDue}`).join('\n')}\n\nTotal due within 7 days: ${s.due.length}.`:`Health status\n• No vaccination or health follow-up is due within the next 7 days.\n• Total health/care records: ${data.health.length}.`;
+  if(i.breeding)return `Breeding & calving\n• Total events: ${data.breeding.length}\n• Positive/successful results: ${data.breeding.filter(x=>/positive|success/i.test(x.result||'')).length}\n• Currently pregnant: ${s.active.filter(c=>c.status==='Pregnant').length}\n• Records with expected calving date: ${data.breeding.filter(x=>x.calving).length}`;
+  if(i.inventory)return s.low.length?`Inventory below/minimum stock\n${s.low.map(x=>`• ${x.name}: ${x.stock} ${x.unit} remaining; minimum ${x.minStock}`).join('\n')}\n\nItems needing replenishment: ${s.low.length}.`:`Inventory status\n• Recorded items: ${data.inventory.length}\n• All recorded items are above their minimum stock levels.`;
+  if(i.cow)return `Herd summary\n• Active animals: ${s.active.length}\n• Lactating: ${s.active.filter(c=>c.status==='Lactating').length}\n• Pregnant: ${s.active.filter(c=>c.status==='Pregnant').length}\n• Dry: ${s.active.filter(c=>c.status==='Dry').length}\n• Calves: ${s.active.filter(c=>c.status==='Calf').length}`;
+  return 'I can answer from the recorded portal data. Be specific about the subject and period. Examples: “lowest milk cows today”, “lowest producing cow last 7 days”, “lowest overall production in last 7 days”, “Lakshmi milk yesterday”, “milk production this week”, “health due”, or “finance summary”.';
+}
+function speakAssistantResponse(text){
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(String(text).replace(/[•\n]/g,' '));
+  const lang=$('assistantLang')?.value||'en-IN';u.lang=lang;u.rate=0.95;u.pitch=1;
+  const voices=speechSynthesis.getVoices? speechSynthesis.getVoices():[];
+  const match=voices.find(v=>String(v.lang||'').toLowerCase()===lang.toLowerCase())||voices.find(v=>String(v.lang||'').toLowerCase().startsWith(lang.slice(0,2).toLowerCase()));
+  if(match)u.voice=match;
+  speechSynthesis.speak(u);
+}
+function ask(text,spoken=false){
+  const q=(text||'').trim();if(!q)return;
+  add(q,'user');input.value='';
+  const response=answer(q);setTimeout(()=>{add(response,'bot');if(spoken)speakAssistantResponse(response)},120);
+}
+$('assistantLaunch').onclick=()=>{panel.classList.toggle('show');if(panel.classList.contains('show'))input.focus()};
+$('assistantClose').onclick=()=>panel.classList.remove('show');
+$('assistantForm').onsubmit=e=>{e.preventDefault();ask(input.value,false)};
+document.querySelectorAll('.assistant-suggestions button').forEach(b=>b.onclick=()=>ask(b.textContent,false));
+const Recognizer=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(Recognizer){
+  const rec=new Recognizer();rec.continuous=false;rec.interimResults=false;rec.maxAlternatives=3;
+  rec.onstart=()=>{voice.classList.add('listening');voice.textContent='●';voice.title='Listening… speak your Farm Assistant question'};
+  rec.onend=()=>{voice.classList.remove('listening');voice.textContent='🎙';voice.title='Ask by voice'};
+  rec.onerror=e=>{voice.classList.remove('listening');voice.textContent='🎙';const msg=e&&e.error==='not-allowed'?'Microphone permission is blocked. Allow microphone access for this site and try again.':e&&e.error==='no-speech'?'No speech was detected. Please speak clearly and try again.':e&&e.error==='language-not-supported'?'The selected voice language is not supported by this browser. Choose EN or தமிழ்.':'I could not understand the voice input. Please try again or type the question.';add(msg,'bot');};
+  rec.onresult=e=>{
+    let said='';
+    for(let r=e.resultIndex||0;r<e.results.length;r++){if(e.results[r].isFinal)said+=(said?' ':'')+e.results[r][0].transcript;}
+    said=said.trim();if(!said)return;
+    input.value=said;ask(said,true);
+  };
+  voice.onclick=()=>{
+    const lang=$('assistantLang')?.value||'en-IN';rec.lang=lang;
+    try{rec.start()}catch(e){if(e.name!=='InvalidStateError')add('Voice input could not start. Please try again.','bot');}
+  };
+}else{
+  voice.onclick=()=>add('Voice input is not supported in this browser. You can still type your question.','bot');
+  voice.title='Voice input is not supported in this browser';
+}
+add('Hello — I’m your Farm Assistant. I read the live records already in this portal and can help you understand what needs attention.','bot');
 })();
 </script>
 <style>
@@ -1123,7 +1159,7 @@ checkSession();
 </style>
 <script>
 /* Language picker is added after the assistant so both text and voice can use it. */
-(function(){const voice=document.getElementById('assistantVoice');if(!voice)return;const select=document.createElement('select');select.id='assistantLang';select.title='Assistant response language';select.setAttribute('aria-label','Assistant response language');select.innerHTML='<option value="auto">Auto</option><option value="en-IN">EN</option><option value="ta-IN">தமிழ்</option><option value="tl-IN">Tanglish</option>';voice.before(select);const notice=document.querySelector('.assistant-notice');if(notice)notice.textContent='Type in English, தமிழ், or Tanglish. Select the response language when you want to force English, தமிழ், or Tanglish.';select.onchange=()=>{if(select.value==='ta-IN')input.placeholder='தமிழில் கேள்வியை எழுதுங்கள்…';else if(select.value==='tl-IN')input.placeholder='Tanglish-la question கேளுங்க…';else input.placeholder='Ask about your farm…'};})()
+(function(){const voice=document.getElementById('assistantVoice');if(!voice)return;const select=document.createElement('select');select.id='assistantLang';select.title='Voice language';select.setAttribute('aria-label','Voice language');select.innerHTML='<option value="en-IN">EN</option><option value="ta-IN">தமிழ்</option>';voice.before(select);const notice=document.querySelector('.assistant-notice');if(notice)notice.textContent='Ask in English, தமிழ், or Tanglish. For voice input, choose EN or தமிழ் first.'})()
 </script>
 </body>
 </html>
