@@ -53,6 +53,83 @@ body.locked .login-screen{display:flex}
 .capacity-note{color:var(--muted);font-size:11px;margin-top:8px}
 </style>
 
+<style>
+/* ================= KMP THEME + BILLING EXTENSION ================= */
+:root{
+  --theme-primary:#7b3f1d;
+  --theme-secondary:#c47b36;
+  --theme-soft:#f3e6d8;
+  --theme-green:#3f7d4d;
+}
+body{
+  transition:background .25s ease,color .25s ease;
+}
+.brand-logo-wrap,.login-logo-wrap,.billing-logo-wrap{
+  background:#fff;
+}
+.billing-logo{width:86px;height:86px;object-fit:contain;display:block;border-radius:8px}
+.billing-quick-panel .panel-head{align-items:flex-start}
+.toolbar-actions{display:flex;gap:8px;flex-wrap:wrap}
+.billing-filterbar{display:flex;gap:9px;flex-wrap:wrap;margin:0 0 14px}
+.billing-filterbar .search{min-width:250px}
+.billing-filterbar select{min-width:150px}
+.billing-table td,.billing-table th{white-space:nowrap}
+.invoice-modal{width:min(1080px,100%)}
+.invoice-head{display:grid;grid-template-columns:1.4fr .8fr;gap:16px;align-items:start}
+.invoice-brand{display:flex;gap:14px;align-items:center}
+.invoice-brand h3{margin:0;font-size:20px}
+.invoice-brand p{margin:4px 0;color:var(--muted);font-size:12px}
+.invoice-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.invoice-meta .field{background:transparent}
+.invoice-customer{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.invoice-items{margin-top:16px}
+.invoice-items table input{width:100%;min-width:70px;padding:8px}
+.invoice-items th,.invoice-items td{padding:7px 5px}
+.invoice-items .item-name{min-width:180px}
+.invoice-total-grid{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-top:15px}
+.invoice-totals{border:1px solid var(--line);border-radius:12px;padding:13px;background:rgba(0,0,0,.08)}
+.total-row{display:flex;justify-content:space-between;padding:6px 0;color:var(--muted)}
+.total-row.grand{font-size:19px;color:var(--text);font-weight:800;border-top:1px solid var(--line);margin-top:5px;padding-top:10px}
+.bill-status{font-weight:800}
+.light-invoice-preview{background:#fff;color:#222}
+body[data-theme="light"]{
+  --bg:#f5f7f6;--panel:#fff;--panel2:#f7faf9;--line:#d6e0dc;
+  --text:#1d2a27;--muted:#63736d;--accent:#2f7d4a;--accent2:#b56a2d;
+  --warn:#a06b00;--danger:#b53b49;--shadow:0 12px 35px rgba(39,58,50,.12)
+}
+body[data-theme="light"]{
+  background:linear-gradient(135deg,#f8fbfa,#eef4f0 55%,#fff);
+}
+body[data-theme="light"] .sidebar{background:rgba(255,255,255,.94)}
+body[data-theme="light"] .card,
+body[data-theme="light"] .panel{background:linear-gradient(145deg,#fff,#f8fbfa)}
+body[data-theme="light"] .btn{background:#fff;color:var(--text)}
+body[data-theme="light"] .btn.primary{background:linear-gradient(135deg,var(--theme-green),var(--theme-secondary));color:#fff}
+body[data-theme="light"] input,
+body[data-theme="light"] select,
+body[data-theme="light"] textarea,
+body[data-theme="light"] .field{background:#fff;color:var(--text)}
+body[data-theme="light"] .nav button:hover,
+body[data-theme="light"] .nav button.active{background:#eef5f1;color:var(--text)}
+body[data-theme="light"] tr:hover td{background:#f4f8f6}
+body[data-theme="light"] .metric,
+body[data-theme="light"] .mini{background:#f5f9f7;border-color:var(--line)}
+body[data-theme="light"] .login-screen{background:linear-gradient(135deg,#f8fbfa,#edf4ef)}
+body[data-theme="light"] .login-card{background:#fff}
+body[data-theme="light"] .login-card input{background:#fff;color:#1d2a27}
+body[data-theme="light"] .modal-box{background:#fff;color:#1d2a27}
+body[data-theme="light"] .invoice-totals{background:#f7faf9}
+@media(max-width:760px){
+ .invoice-head,.invoice-customer,.invoice-total-grid{grid-template-columns:1fr}
+ .billing-filterbar .search{min-width:100%}
+ .invoice-meta{grid-template-columns:1fr}
+}
+@media print{
+ body{background:#fff!important;color:#111!important}
+ .sidebar,.top,.toast,.modal,.assistant-panel,.assistant-launch{display:none!important}
+ .main{margin:0;width:100%;padding:0}
+}
+</style>
 </head>
 <body class="locked">
 
@@ -88,7 +165,7 @@ body.locked .login-screen{display:flex}
   </nav>
 </aside>
 <main class="main">
-<header class="top"><div class="title"><button class="btn icon-btn hamb" onclick="toggleSide()">☰</button><h1 id="pageTitle">Farm Command Center</h1><p id="pageSub">Real-time dairy operations overview</p></div><div class="top-actions"><button class="btn hide-mobile" onclick="openCow()">＋ Add Cow</button><button class="btn" onclick="loadAll()">↻ Sync</button><button class="btn primary" onclick="quickBackup()">↥ Backup</button><button class="btn danger" onclick="handleLogout()" title="Sign out">⏻ Logout</button></div></header>
+<header class="top"><div class="title"><button class="btn icon-btn hamb" onclick="toggleSide()">☰</button><h1 id="pageTitle">Farm Command Center</h1><p id="pageSub">Real-time dairy operations overview</p></div><div class="top-actions"><button class="btn" id="themeToggle" onclick="toggleTheme()" title="Switch theme">☀️ Light</button><button class="btn hide-mobile" onclick="openCow()">＋ Add Cow</button><button class="btn" onclick="loadAll()">↻ Sync</button><button class="btn primary" onclick="quickBackup()">↥ Backup</button><button class="btn danger" onclick="handleLogout()" title="Sign out">⏻ Logout</button></div></header>
 
 <section id="dashboard" class="page active">
   <div class="cards" id="dashCards"></div>
@@ -101,34 +178,40 @@ body.locked .login-screen{display:flex}
 
 <section id="cows" class="page">
   <div class="panel"><div class="panel-head"><h2>Animal Registry</h2><button class="btn primary" onclick="openCow()">＋ Register Cow</button></div>
-  <div class="toolbar"><input class="search" id="cowSearch" placeholder="Search ID, tag, name or breed..." oninput="pageState.cows=1;renderCows()"><select id="cowStatus" onchange="pageState.cows=1;renderCows()"><option value="">All Status</option><option>Lactating</option><option>Pregnant</option><option>Dry</option><option>Calf</option><option>Active</option><option>Sold</option></select></div><div class="capacity-note">Capacity: 2,000,000 cows · Showing 100 per page for fast performance</div>
+  <div class="toolbar"><input class="search" id="cowSearch" placeholder="Search ID, tag, name or breed..." oninput="pageState.cows=1;renderCows()"><select id="cowStatus" onchange="pageState.cows=1;renderCows()"><option value="">All Status</option><option>Lactating</option><option>Pregnant</option><option>Dry</option><option>Calf</option><option>Active</option><option>Sold</option></select><select id="cowSort" onchange="pageState.cows=1;renderCows()"><option value="name">Sort: Name A–Z</option><option value="id">Cow ID</option><option value="milk">Milk High–Low</option><option value="newest">Recently Added</option></select></div><div class="capacity-note">Capacity: 2,000,000 cows · Showing 100 per page for fast performance</div>
   <div class="table-wrap"><table><thead><tr><th>Photo</th><th>ID</th><th>Name</th><th>Breed</th><th>DOB</th><th>Status</th><th>Milk/day</th><th>Actions</th></tr></thead><tbody id="cowTable"></tbody></table></div><div id="cowPagination"></div></div>
 </section>
 
 <section id="milk" class="page">
  <div class="panel"><div class="panel-head"><h2>Milk Production</h2><button class="btn primary" onclick="openMilk()">＋ Record Milk</button></div>
- <div class="toolbar"><input class="search" id="milkSearch" placeholder="Search cow..." oninput="pageState.milk=1;renderMilk()"><input type="date" id="milkDate" onchange="pageState.milk=1;renderMilk()"></div>
+ <div class="toolbar"><input class="search" id="milkSearch" placeholder="Search cow..." oninput="pageState.milk=1;renderMilk()"><input type="date" id="milkDate" onchange="pageState.milk=1;renderMilk()"><select id="milkSort" onchange="pageState.milk=1;renderMilk()"><option value="date-desc">Newest Date</option><option value="date-asc">Oldest Date</option><option value="cow-asc">Cow A–Z</option><option value="total-desc">Highest Total</option><option value="total-asc">Lowest Total</option></select></div>
  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Cow</th><th>Morning</th><th>Afternoon</th><th>Evening</th><th>Total</th><th>Actions</th></tr></thead><tbody id="milkTable"></tbody></table></div><div id="milkPagination"></div></div>
 </section>
 
 <section id="health" class="page">
  <div class="panel"><div class="panel-head"><h2>Health & Vaccination</h2><button class="btn primary" onclick="openHealth()">＋ Health Record</button></div>
+ <div class="toolbar"><select id="healthSort" onchange="pageState.health=1;renderHealth()"><option value="date-desc">Newest Date</option><option value="date-asc">Oldest Date</option><option value="cow-asc">Cow A–Z</option><option value="type-asc">Type A–Z</option><option value="due-asc">Next Due Soonest</option><option value="cost-desc">Highest Cost</option></select></div>
  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Cow</th><th>Type</th><th>Details</th><th>Next Due</th><th>Cost</th><th>Actions</th></tr></thead><tbody id="healthTable"></tbody></table></div><div id="healthPagination"></div></div>
 </section>
 
 <section id="breeding" class="page">
  <div class="panel"><div class="panel-head"><h2>Breeding & Calving</h2><button class="btn primary" onclick="openBreeding()">＋ Breeding Record</button></div>
+ <div class="toolbar"><select id="breedingSort" onchange="pageState.breeding=1;renderBreeding()"><option value="date-desc">Newest Date</option><option value="date-asc">Oldest Date</option><option value="cow-asc">Cow A–Z</option><option value="event-asc">Event A–Z</option><option value="calving-asc">Expected Calving Soonest</option></select></div>
  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Cow</th><th>Event</th><th>Expected Calving</th><th>Result</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="breedingTable"></tbody></table></div><div id="breedingPagination"></div></div>
 </section>
 
 <section id="finance" class="page">
  <div class="cards" id="financeCards"></div>
  <div class="panel"><div class="panel-head"><h2>Income & Expenses</h2><button class="btn primary" onclick="openFinance()">＋ Add Transaction</button></div>
+ <div class="toolbar"><select id="financeSort" onchange="pageState.finance=1;renderFinance()"><option value="date-desc">Newest Date</option><option value="date-asc">Oldest Date</option><option value="amount-desc">Highest Amount</option><option value="amount-asc">Lowest Amount</option><option value="type-asc">Type A–Z</option><option value="category-asc">Category A–Z</option></select></div>
  <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Category</th><th>Description</th><th>Amount</th><th>Actions</th></tr></thead><tbody id="financeTable"></tbody></table></div><div id="financePagination"></div></div>
 </section>
 
+
+
 <section id="inventory" class="page">
  <div class="panel"><div class="panel-head"><h2>Feed & Inventory</h2><button class="btn primary" onclick="openInventory()">＋ Add Item</button></div>
+ <div class="toolbar"><select id="inventorySort" onchange="renderInventory()"><option value="name">Sort: Item A–Z</option><option value="stock">Low Stock First</option><option value="cost">Highest Cost</option></select></div>
  <div class="table-wrap"><table><thead><tr><th>Item</th><th>Category</th><th>Stock</th><th>Unit</th><th>Min Stock</th><th>Cost</th><th>Actions</th></tr></thead><tbody id="inventoryTable"></tbody></table></div><div id="inventoryPagination"></div></div>
 </section>
 
@@ -291,7 +374,7 @@ function checkSession(){
   if(s){ unlockApp(s.u); }
   else{ document.body.classList.add('locked'); $('loginUser')?.focus(); }
 }
-let data={cows:[],milk:[],health:[],breeding:[],finance:[],inventory:[],settings:{farm:'KMP Dairy Farms',owner:'',location:'',currency:'INR ₹'}};
+let data={cows:[],milk:[],health:[],breeding:[],finance:[],billing:[],inventory:[],settings:{farm:'KMP Dairy Farms',owner:'',location:'',currency:'INR ₹'}};
 let syncBusy=false;
 
 const $=id=>document.getElementById(id);
@@ -402,6 +485,7 @@ async function openDB(){
       health:Array.isArray(incoming.health)?incoming.health:[],
       breeding:Array.isArray(incoming.breeding)?incoming.breeding:[],
       finance:Array.isArray(incoming.finance)?incoming.finance:[],
+      billing:Array.isArray(incoming.billing)?incoming.billing:[],
       inventory:Array.isArray(incoming.inventory)?incoming.inventory:[],
       settings:{...data.settings,...(incoming.settings||{})}
     };
@@ -489,13 +573,13 @@ async function remove(store,id){
 function showPage(id){
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');
  document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));
- const titles={dashboard:['Farm Command Center','Real-time dairy operations overview'],cows:['Animal Registry','Complete livestock database'],milk:['Milk Production','Daily and historical production'],health:['Health & Vaccination','Animal health monitoring'],breeding:['Breeding & Calving','Reproductive management'],finance:['Finance','Income, expenses and profitability'],inventory:['Feed & Inventory','Stock and consumables'],reports:['Report Center','Generate printable farm reports'],backup:['Data Protection Center','Backup, restore and data portability'],settings:['Farm Settings','Configure your farm']};
+ const titles={billing:['Billing','Invoices, payments and customer billing'],dashboard:['Farm Command Center','Real-time dairy operations overview'],cows:['Animal Registry','Complete livestock database'],milk:['Milk Production','Daily and historical production'],health:['Health & Vaccination','Animal health monitoring'],breeding:['Breeding & Calving','Reproductive management'],finance:['Finance','Income, expenses and profitability'],inventory:['Feed & Inventory','Stock and consumables'],reports:['Report Center','Generate printable farm reports'],backup:['Data Protection Center','Backup, restore and data portability'],settings:['Farm Settings','Configure your farm']};
  $('pageTitle').textContent=titles[id][0];$('pageSub').textContent=titles[id][1];$('sidebar').classList.remove('open');
  if(id==='dashboard')renderDashboard()
 }
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
 
-function renderAll(){renderDashboard();renderCows();renderMilk();renderHealth();renderBreeding();renderFinance();renderInventory();if(window.renderCharts)window.renderCharts()}
+function renderAll(){renderDashboard();renderCows();renderMilk();renderHealth();renderBreeding();renderFinance();renderBilling();renderInventory();if(window.renderCharts)window.renderCharts()}
 function renderDashboard(){
  const cows=data.cows.filter(c=>c.status!=='Sold'&&c.status!=='Deceased'), lact=cows.filter(c=>c.status==='Lactating').length, preg=cows.filter(c=>c.status==='Pregnant').length;
  const day=today(), milkToday=data.milk.filter(x=>x.date===day).reduce((a,x)=>a+Number(x.total||0),0);
@@ -550,7 +634,14 @@ function pageItems(arr,key){
 
 function renderCows(){
  const q=($('cowSearch')?.value||'').toLowerCase(), st=$('cowStatus')?.value||'';
- const arr=data.cows.filter(c=>(!q||[c.id,c.tag,c.name,c.breed].join(' ').toLowerCase().includes(q))&&(!st||c.status===st));
+ let arr=data.cows.filter(c=>(!q||[c.id,c.tag,c.name,c.breed].join(' ').toLowerCase().includes(q))&&(!st||c.status===st));
+ const cowSort=$('cowSort')?.value||'name';
+ if(cowSort==='id')arr.sort((a,b)=>String(a.id||'').localeCompare(String(b.id||''),undefined,{numeric:true}));
+ else if(cowSort==='newest')arr.sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+ else if(cowSort==='milk'){
+   const mm={};for(const x of data.milk){if(x.date===today())mm[x.cowId]=(mm[x.cowId]||0)+Number(x.total||0);}
+   arr.sort((a,b)=>(mm[b.id]||0)-(mm[a.id]||0));
+ }else arr.sort((a,b)=>String(a.name||a.id||'').localeCompare(String(b.name||b.id||'')));
  const visible=pageItems(arr,'cows');
  const todayMilk={};
  for(const x of data.milk){if(x.date===today())todayMilk[x.cowId]=(todayMilk[x.cowId]||0)+Number(x.total||0);}
@@ -562,34 +653,84 @@ function milkForCow(id){const a=data.milk.filter(x=>x.cowId===id&&x.date===today
 function renderMilk(){
  const q=($('milkSearch')?.value||'').toLowerCase(), d=$('milkDate')?.value||'';
  let arr=data.milk.filter(x=>(!d||x.date===d)&&(!q||cowName(x.cowId).toLowerCase().includes(q)));
- arr=[...arr].sort((a,b)=>b.date.localeCompare(a.date));
+ const milkSort=$('milkSort')?.value||'date-desc';
+ arr=[...arr].sort((a,b)=>{
+   if(milkSort==='date-asc')return String(a.date||'').localeCompare(String(b.date||''));
+   if(milkSort==='cow-asc')return cowName(a.cowId).localeCompare(cowName(b.cowId));
+   if(milkSort==='total-desc')return Number(b.total||0)-Number(a.total||0);
+   if(milkSort==='total-asc')return Number(a.total||0)-Number(b.total||0);
+   return String(b.date||'').localeCompare(String(a.date||''));
+ });
  const visible=pageItems(arr,'milk');
  $('milkTable').innerHTML=visible.length?visible.map(x=>`<tr><td>${x.date}</td><td>${esc(cowName(x.cowId))}</td><td>${x.morning}</td><td>${x.afternoon}</td><td>${x.evening}</td><td><b>${Number(x.total).toFixed(1)} L</b></td><td><button class="btn" onclick="openMilk('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('milk','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No milk records.</td></tr>';
  renderPageControls('milk',arr.length);
 }
 
 function renderHealth(){
- const arr=[...data.health].sort((a,b)=>b.date.localeCompare(a.date));
+ const healthSort=$('healthSort')?.value||'date-desc';
+ const arr=[...data.health].sort((a,b)=>{
+   if(healthSort==='date-asc')return String(a.date||'').localeCompare(String(b.date||''));
+   if(healthSort==='cow-asc')return cowName(a.cowId).localeCompare(cowName(b.cowId));
+   if(healthSort==='type-asc')return String(a.type||'').localeCompare(String(b.type||''));
+   if(healthSort==='due-asc')return String(a.nextDue||'9999-12-31').localeCompare(String(b.nextDue||'9999-12-31'));
+   if(healthSort==='cost-desc')return Number(b.cost||0)-Number(a.cost||0);
+   return String(b.date||'').localeCompare(String(a.date||''));
+ });
  const visible=pageItems(arr,'health');
  $('healthTable').innerHTML=visible.length?visible.map(x=>`<tr><td>${x.date}</td><td>${esc(cowName(x.cowId))}</td><td><span class="status ${x.type==='Vaccination'?'green':'yellow'}">${esc(x.type)}</span></td><td>${esc(x.details||x.vaccine||'—')}</td><td>${esc(x.nextDue||'—')}</td><td>${money(x.cost)}</td><td><button class="btn" onclick="openHealth('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('health','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No health records.</td></tr>';
  renderPageControls('health',arr.length);
 }
 function renderBreeding(){
- const arr=[...data.breeding].sort((a,b)=>b.date.localeCompare(a.date));
+ const breedingSort=$('breedingSort')?.value||'date-desc';
+ const arr=[...data.breeding].sort((a,b)=>{
+   if(breedingSort==='date-asc')return String(a.date||'').localeCompare(String(b.date||''));
+   if(breedingSort==='cow-asc')return cowName(a.cowId).localeCompare(cowName(b.cowId));
+   if(breedingSort==='event-asc')return String(a.event||'').localeCompare(String(b.event||''));
+   if(breedingSort==='calving-asc')return String(a.calving||'9999-12-31').localeCompare(String(b.calving||'9999-12-31'));
+   return String(b.date||'').localeCompare(String(a.date||''));
+ });
  const visible=pageItems(arr,'breeding');
  $('breedingTable').innerHTML=visible.length?visible.map(x=>`<tr><td>${x.date}</td><td>${esc(cowName(x.cowId))}</td><td>${esc(x.event)}</td><td>${esc(x.calving||'—')}</td><td>${esc(x.result||'—')}</td><td>${esc(x.notes||'—')}</td><td><button class="btn" onclick="openBreeding('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('breeding','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No breeding records.</td></tr>';
  renderPageControls('breeding',arr.length);
 }
+function financeDateValue(v){
+ const s=String(v??'').trim();
+ if(!s)return 0;
+ // Normalise common date formats so late-entered transactions are placed by
+ // their transaction date, not by the time they were entered.
+ if(/^\d{4}-\d{2}-\d{2}/.test(s)){
+   const t=Date.parse(s);
+   if(!Number.isNaN(t))return t;
+ }
+ let m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+ if(m){const t=Date.parse(`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`);if(!Number.isNaN(t))return t;}
+ const t=Date.parse(s);
+ return Number.isNaN(t)?0:t;
+}
 function renderFinance(){
  const inc=data.finance.filter(x=>x.type==='Income').reduce((s,x)=>s+Number(x.amount),0),exp=data.finance.filter(x=>x.type==='Expense').reduce((s,x)=>s+Number(x.amount),0);
  $('financeCards').innerHTML=[['TOTAL INCOME',money(inc)],['TOTAL EXPENSE',money(exp)],['NET BALANCE',money(inc-exp)],['TRANSACTIONS',data.finance.length]].map(x=>`<div class="card"><div class="label">${x[0]}</div><div class="value">${x[1]}</div></div>`).join('');
- const arr=[...data.finance].sort((a,b)=>b.date.localeCompare(a.date));
+ const financeSort=$('financeSort')?.value||'date-desc';
+ const arr=[...data.finance].sort((a,b)=>{
+   // Date sorting always uses the transaction DATE. This means a transaction
+   // entered today with an older date goes to its correct historical position.
+   if(financeSort==='date-asc')return financeDateValue(a.date)-financeDateValue(b.date);
+   if(financeSort==='amount-desc')return Number(b.amount||0)-Number(a.amount||0);
+   if(financeSort==='amount-asc')return Number(a.amount||0)-Number(b.amount||0);
+   if(financeSort==='type-asc')return String(a.type||'').localeCompare(String(b.type||''));
+   if(financeSort==='category-asc')return String(a.category||'').localeCompare(String(b.category||''));
+   return financeDateValue(b.date)-financeDateValue(a.date);
+ });
  const visible=pageItems(arr,'finance');
  $('financeTable').innerHTML=visible.length?visible.map(x=>`<tr><td>${x.date}</td><td><span class="status ${x.type==='Income'?'green':'red'}">${x.type}</span></td><td>${esc(x.category)}</td><td>${esc(x.description||'')}</td><td>${money(x.amount)}</td><td><button class="btn" onclick="openFinance('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('finance','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="6" class="empty">No transactions.</td></tr>';
  renderPageControls('finance',arr.length);
 }
 function renderInventory(){
- const arr=[...data.inventory];
+ let arr=[...data.inventory];
+ const inventorySort=$('inventorySort')?.value||'name';
+ if(inventorySort==='stock')arr.sort((a,b)=>Number(a.stock||0)-Number(b.stock||0));
+ else if(inventorySort==='cost')arr.sort((a,b)=>Number(b.cost||0)-Number(a.cost||0));
+ else arr.sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
  const visible=pageItems(arr,'inventory');
  $('inventoryTable').innerHTML=visible.length?visible.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.category)}</td><td class="${Number(x.stock)<=Number(x.minStock)?'red':''}">${x.stock}</td><td>${esc(x.unit)}</td><td>${x.minStock}</td><td>${money(x.cost)}</td><td><button class="btn" onclick="openInventory('${x.id}')">Edit</button> <button class="btn danger" onclick="remove('inventory','${x.id}')">Delete</button></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No inventory items.</td></tr>';
  renderPageControls('inventory',arr.length);
@@ -606,8 +747,200 @@ function cowOptions(selected=''){
  return '<option value="">Select cow</option>'+list.map(c=>`<option value="${c.id}" ${c.id===selected?'selected':''}>${esc(c.name||c.id)} — ${esc(c.tag||c.id)}</option>`).join('');
 }
 function modal(title,body){$('modalTitle').textContent=title;$('modalBody').innerHTML=body;$('modal').classList.add('show')}
-function closeModal(){$('modal').classList.remove('show')}
+function closeModal(){$('modal').classList.remove('show');if($('modal'))$('modal').dataset.invoiceId=''}
 window.onclick=e=>{if(e.target===$('modal'))closeModal()}
+
+
+/* ================= BILLING / INVOICE MODULE ================= */
+const BILL_LOGO = "data:image/jpeg;base64,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QdNjS5u/DOpzpMs1uQo+1WVxGfKuoAZNjOnKPhZFQlCfW/Kb6/TisHXPCtn4j/s1b+CSWXTb2LULW7RzFLBOmQHjZeVLIzRuBhXjmlRsq7KSMVHZilJyfvavuV/H3jnQvhr4P1PxT4m1e30XQdLiM9zfXRISNcgKAB8zMzFVVBkuzKoBLAV8Z618avj9+1r/AKH8EPD118Pfhxckx/8ACbeIGFtcXkfkPuKZ3ukbMdivbK7h0VzJF8yV7tN8F5fj140Pir4n2I1Dwjpszjwt4G1C3P2VBhkOp38LZE1zKpbyoZABBE+CizPJt90MTyMr7WOPuqw+Ue/r3I/pSacvJDjJQ1Su/PZHxh8OP+CYfgnTLx9S+IniXWviJq9zJI1yHkewtp3JLCSTYxnaQFpPn84K277lfV3gb4d+GPhppraX4R8NaX4aspJAz2+lWUdtG7AAF2CL8z7QOW5OK60RjuMmn0o04x2HKrOfxMTaKWiitDMKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//9k=";
+let billingSortEnabled = localStorage.getItem('kmpBillingAutoSort') !== '0';
+
+function themeInit(){
+  const theme=localStorage.getItem('kmpTheme')||'dark';
+  document.body.setAttribute('data-theme',theme);
+  updateThemeButton();
+}
+function updateThemeButton(){
+  const b=$('themeToggle');if(!b)return;
+  const light=document.body.getAttribute('data-theme')==='light';
+  b.textContent=light?'🌙 Dark':'☀️ Light';
+  b.title=light?'Switch to dark mode':'Switch to light mode';
+}
+function toggleTheme(){
+  const next=document.body.getAttribute('data-theme')==='light'?'dark':'light';
+  document.body.setAttribute('data-theme',next);localStorage.setItem('kmpTheme',next);updateThemeButton();
+}
+function billingAutoSortToggle(){
+  billingSortEnabled=!billingSortEnabled;
+  localStorage.setItem('kmpBillingAutoSort',billingSortEnabled?'1':'0');
+  updateBillingSortButton();
+  renderBilling();
+}
+function updateBillingSortButton(){
+  const b=$('billingSortToggle');if(b)b.textContent=billingSortEnabled?'↕ Auto Sort: ON':'↕ Auto Sort: OFF';
+}
+function nextInvoiceNo(){
+  const yearMonth=new Date().toISOString().slice(0,7).replace('-','');
+  const prefix='KMP-'+yearMonth+'-';
+  let max=0;
+  for(const x of (data.billing||[])){
+    const m=String(x.invoiceNo||'').match(new RegExp('^'+prefix+'(\\d+)$'));
+    if(m)max=Math.max(max,Number(m[1]));
+  }
+  return prefix+String(max+1).padStart(4,'0');
+}
+function billingItemsTotal(inv){return (inv.items||[]).reduce((s,i)=>s+Number(i.qty||0)*Number(i.rate||0),0)}
+function invoiceDiscountTotal(inv){return Number(inv.discount||0)}
+function invoiceTaxable(inv){return Math.max(0,billingItemsTotal(inv)-invoiceDiscountTotal(inv))}
+function invoiceTaxTotal(inv){return invoiceTaxable(inv)*Number(inv.taxRate||0)/100}
+function invoiceGrand(inv){return Math.max(0,invoiceTaxable(inv)+invoiceTaxTotal(inv))}
+function invoiceBalance(inv){return Math.max(0,invoiceGrand(inv)-Number(inv.paid||0))}
+function invoiceStatus(inv){
+  const g=invoiceGrand(inv),p=Number(inv.paid||0);
+  return p>=g&&g>0?'Paid':p>0?'Partial':'Credit';
+}
+function renderBilling(){
+  if(!$('billingTable'))return;
+  const q=($('billingSearch')?.value||'').toLowerCase().trim();
+  const status=$('billingStatusFilter')?.value||'';
+  let arr=(data.billing||[]).filter(x=>{
+    const hay=[x.invoiceNo,x.customerName,x.customerPhone,x.customerAddress].join(' ').toLowerCase();
+    return (!q||hay.includes(q))&&(!status||invoiceStatus(x)===status);
+  });
+  const sort=$('billingSort')?.value||'date-desc';
+  if(billingSortEnabled){
+    arr.sort((a,b)=>{
+      if(sort==='invoice-asc')return String(a.invoiceNo||'').localeCompare(String(b.invoiceNo||''),undefined,{numeric:true});
+      if(sort==='customer-asc')return String(a.customerName||'').localeCompare(String(b.customerName||''));
+      if(sort==='amount-desc')return invoiceGrand(b)-invoiceGrand(a);
+      if(sort==='amount-asc')return invoiceGrand(a)-invoiceGrand(b);
+      const d=String(a.date||'').localeCompare(String(b.date||''));return sort==='date-asc'?d:-d;
+    });
+  }
+  const totalSales=(data.billing||[]).reduce((s,x)=>s+invoiceGrand(x),0);
+  const paid=(data.billing||[]).reduce((s,x)=>s+Number(x.paid||0),0);
+  const outstanding=Math.max(0,totalSales-paid);
+  const todaySales=(data.billing||[]).filter(x=>x.date===today()).reduce((s,x)=>s+invoiceGrand(x),0);
+  $('billingCards').innerHTML=[
+    ['TOTAL BILLS',(data.billing||[]).length,'Saved invoices'],
+    ['TODAY SALES',money(todaySales),'Today’s billed value'],
+    ['TOTAL SALES',money(totalSales),'All saved bills'],
+    ['OUTSTANDING',money(outstanding),'Customer balance']
+  ].map(x=>`<div class="card"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="trend">${x[2]}</div></div>`).join('');
+  $('billingTable').innerHTML=arr.length?arr.map(x=>{
+    const st=invoiceStatus(x), cls=st==='Paid'?'green':st==='Partial'?'yellow':'red';
+    return `<tr><td><b>${esc(x.invoiceNo)}</b></td><td>${esc(x.date||'')}</td><td>${esc(x.customerName||'Walk-in Customer')}<br><small class="muted">${esc(x.customerPhone||'')}</small></td><td>${(x.items||[]).length}</td><td><b>${money(invoiceGrand(x))}</b></td><td>${money(x.paid)}</td><td>${money(invoiceBalance(x))}</td><td><span class="status ${cls}">${st}</span></td><td><button class="btn" onclick="openInvoice('${esc(x.id)}')">Edit</button> <button class="btn" onclick="printInvoice('${esc(x.id)}')">Print</button> <button class="btn danger" onclick="remove('billing','${esc(x.id)}')">Delete</button></td></tr>`;
+  }).join(''):'<tr><td colspan="9" class="empty">No bills found. Create your first bill.</td></tr>';
+  updateBillingSortButton();
+}
+function invoiceRow(item={}){
+  const row=document.createElement('tr');
+  row.innerHTML=`<td><input class="inv-item-name item-name" placeholder="Product / Service" value="${esc(item.name||'')}"></td>
+    <td><input class="inv-item-unit" placeholder="pcs" value="${esc(item.unit||'pcs')}"></td>
+    <td><input class="inv-item-qty" type="number" min="0" step="0.01" value="${Number(item.qty||1)}" oninput="recalcInvoice()"></td>
+    <td><input class="inv-item-rate" type="number" min="0" step="0.01" value="${Number(item.rate||0)}" oninput="recalcInvoice()"></td>
+    <td class="inv-item-amount">₹ 0</td>
+    <td><button type="button" class="btn danger" onclick="this.closest('tr').remove();recalcInvoice()">✕</button></td>`;
+  $('invoiceItemsBody').appendChild(row);
+  recalcInvoice();
+}
+function recalcInvoice(){
+  if(!$('invoiceItemsBody'))return;
+  let subtotal=0;
+  $('invoiceItemsBody').querySelectorAll('tr').forEach(r=>{
+    const q=Number(r.querySelector('.inv-item-qty')?.value||0), rate=Number(r.querySelector('.inv-item-rate')?.value||0), amount=q*rate;
+    subtotal+=amount;
+    const out=r.querySelector('.inv-item-amount');if(out)out.textContent=money(amount);
+  });
+  const discount=Math.max(0,Number($('invDiscount')?.value||0));
+  const taxRate=Math.max(0,Number($('invTaxRate')?.value||0));
+  const taxable=Math.max(0,subtotal-discount),tax=taxable*taxRate/100,total=taxable+tax,paid=Math.max(0,Number($('invPaid')?.value||0)),balance=Math.max(0,total-paid);
+  if($('invSubtotal'))$('invSubtotal').textContent=money(subtotal);
+  if($('invTaxable'))$('invTaxable').textContent=money(taxable);
+  if($('invTax'))$('invTax').textContent=money(tax);
+  if($('invGrand'))$('invGrand').textContent=money(total);
+  if($('invBalance'))$('invBalance').textContent=money(balance);
+  if($('invStatus'))$('invStatus').textContent=paid>=total&&total>0?'Paid':paid>0?'Partial':'Credit';
+}
+function invoiceModalHtml(inv){
+  const x=inv||{id:'',invoiceNo:nextInvoiceNo(),date:today(),customerName:'',customerPhone:'',customerAddress:'',paymentMode:'Cash',discount:0,taxRate:0,paid:0,notes:'',items:[{name:'',unit:'pcs',qty:1,rate:0}]};
+  return `<div class="invoice-head">
+    <div class="invoice-brand"><div class="billing-logo-wrap"><img class="billing-logo" src="${BILL_LOGO}" alt="KMP Dairy Products"></div><div><h3>KMP DAIRY PRODUCTS</h3><p>${esc(data.settings.farm||'KMP Dairy Farms')}<br>${esc(data.settings.location||'')}<br>${esc(data.settings.owner||'')}</p></div></div>
+    <div class="invoice-meta">
+      <div class="field"><label>Invoice No.</label><input id="invNo" value="${esc(x.invoiceNo)}" readonly></div>
+      <div class="field"><label>Bill Date</label><input type="date" id="invDate" value="${esc(x.date||today())}"></div>
+    </div>
+  </div>
+  <div class="invoice-customer">
+    <div class="field"><label>Customer Name</label><input id="invCustomer" placeholder="Customer / Walk-in Customer" value="${esc(x.customerName||'')}"></div>
+    <div class="field"><label>Mobile Number</label><input id="invPhone" placeholder="10-digit mobile" value="${esc(x.customerPhone||'')}"></div>
+    <div class="field full"><label>Customer Address</label><input id="invAddress" placeholder="Address" value="${esc(x.customerAddress||'')}"></div>
+  </div>
+  <div class="invoice-items">
+   <div class="panel-head"><h3 style="margin:0">Items</h3><button type="button" class="btn primary" onclick="invoiceRow()">＋ Add Item</button></div>
+   <div class="table-wrap"><table><thead><tr><th>Product / Service</th><th>Unit</th><th>Qty</th><th>Rate</th><th>Amount</th><th></th></tr></thead><tbody id="invoiceItemsBody"></tbody></table></div>
+  </div>
+  <div class="invoice-total-grid">
+    <div>
+      <div class="field"><label>Notes</label><textarea id="invNotes" placeholder="Thank you / delivery notes">${esc(x.notes||'')}</textarea></div>
+      <div class="invoice-customer" style="margin-top:10px">
+        <div class="field"><label>Payment Mode</label><select id="invPaymentMode">${['Cash','UPI','Card','Bank Transfer','Credit'].map(v=>`<option ${x.paymentMode===v?'selected':''}>${v}</option>`).join('')}</select></div>
+        <div class="field"><label>Payment Status</label><div class="field" style="padding:11px 0;font-weight:800" id="invStatus">${invoiceStatus(x)}</div></div>
+      </div>
+    </div>
+    <div class="invoice-totals">
+      <div class="total-row"><span>Subtotal</span><b id="invSubtotal">₹ 0</b></div>
+      <div class="field"><label>Discount (₹)</label><input id="invDiscount" type="number" min="0" step="0.01" value="${Number(x.discount||0)}" oninput="recalcInvoice()"></div>
+      <div class="field"><label>Tax / GST (%)</label><input id="invTaxRate" type="number" min="0" step="0.01" value="${Number(x.taxRate||0)}" oninput="recalcInvoice()"></div>
+      <div class="total-row"><span>Taxable</span><b id="invTaxable">₹ 0</b></div>
+      <div class="total-row"><span>Tax</span><b id="invTax">₹ 0</b></div>
+      <div class="total-row grand"><span>Grand Total</span><b id="invGrand">₹ 0</b></div>
+      <div class="field"><label>Amount Paid (₹)</label><input id="invPaid" type="number" min="0" step="0.01" value="${Number(x.paid||0)}" oninput="recalcInvoice()"></div>
+      <div class="total-row"><span>Balance</span><b id="invBalance">₹ 0</b></div>
+    </div>
+  </div>
+  <div class="actions"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveInvoice(true)">Save & Print</button><button class="btn primary" onclick="saveInvoice(false)">Save Bill</button></div>`;
+}
+function openInvoice(id=''){
+  const inv=(data.billing||[]).find(x=>x.id===id);
+  modal(inv?'Edit Bill':'New Bill',invoiceModalHtml(inv));
+  document.querySelector('#modal .modal-box')?.classList.add('invoice-modal');
+  $('modal').dataset.invoiceId=id||'';
+  const items=(inv?.items?.length?inv.items:[{name:'',unit:'pcs',qty:1,rate:0}]);
+  items.forEach(i=>invoiceRow(i));
+  recalcInvoice();
+}
+async function saveInvoice(andPrint=false){
+  const rows=[...($('invoiceItemsBody')?.querySelectorAll('tr')||[])];
+  const items=rows.map(r=>({name:r.querySelector('.inv-item-name')?.value.trim()||'',unit:r.querySelector('.inv-item-unit')?.value.trim()||'pcs',qty:Number(r.querySelector('.inv-item-qty')?.value||0),rate:Number(r.querySelector('.inv-item-rate')?.value||0)})).filter(i=>i.name&&i.qty>0);
+  if(!items.length)return toast('Add at least one bill item');
+  const id=($('modal')?.dataset.invoiceId)||'';
+  const existing=(data.billing||[]).find(x=>x.id===id);
+  const o={id:id||uid('bill'),invoiceNo:$('invNo').value.trim(),date:$('invDate').value||today(),customerName:$('invCustomer').value.trim()||'Walk-in Customer',customerPhone:$('invPhone').value.trim(),customerAddress:$('invAddress').value.trim(),items,paymentMode:$('invPaymentMode').value,discount:Number($('invDiscount').value||0),taxRate:Number($('invTaxRate').value||0),paid:Number($('invPaid').value||0),notes:$('invNotes').value.trim(),createdAt:existing?.createdAt||new Date().toISOString()};
+  const ok=await save('billing',o);
+  if(ok){
+    closeModal();toast(andPrint?'Bill saved — opening print':'Bill saved successfully');
+    if(andPrint)setTimeout(()=>printInvoice(o.id),250);
+  }
+}
+function printInvoice(id){
+  const x=(data.billing||[]).find(a=>a.id===id);if(!x)return;
+  const rows=(x.items||[]).map((i,n)=>`<tr><td>${n+1}</td><td>${esc(i.name)}</td><td>${esc(i.unit||'pcs')}</td><td>${Number(i.qty||0)}</td><td>₹ ${Number(i.rate||0).toLocaleString('en-IN',{maximumFractionDigits:2})}</td><td>₹ ${(Number(i.qty||0)*Number(i.rate||0)).toLocaleString('en-IN',{maximumFractionDigits:2})}</td></tr>`).join('');
+  const subtotal=billingItemsTotal(x),discount=invoiceDiscountTotal(x),taxable=invoiceTaxable(x),tax=invoiceTaxTotal(x),grand=invoiceGrand(x),balance=invoiceBalance(x);
+  const w=window.open('','_blank');if(!w){toast('Allow pop-ups to print bills');return}
+  w.document.write(`<!doctype html><html><head><title>${esc(x.invoiceNo)}</title><style>
+  *{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;background:#f2f2f2;color:#222}.sheet{width:800px;max-width:96%;margin:20px auto;background:#fff;padding:28px;box-shadow:0 2px 15px #bbb}
+  .head{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #7b3f1d;padding-bottom:16px}.brand{display:flex;gap:12px;align-items:center}.brand img{width:80px;height:80px;object-fit:contain}.brand h1{margin:0;font-size:24px;color:#7b3f1d}.brand p,.meta p{margin:4px 0;font-size:12px;color:#666}.meta{text-align:right}.customer{margin:18px 0;padding:12px;background:#f8f4f0;border-left:4px solid #7b3f1d}.customer b{font-size:14px}table{width:100%;border-collapse:collapse;margin-top:15px;font-size:12px}th,td{border:1px solid #ddd;padding:8px}th{background:#f1e7df;text-align:left}.totals{margin:15px 0 0 auto;width:330px}.tr{display:flex;justify-content:space-between;padding:6px}.grand{font-size:18px;font-weight:bold;border-top:2px solid #7b3f1d;margin-top:5px}.balance{color:#9b3a2c;font-weight:bold}.foot{margin-top:25px;border-top:1px solid #ddd;padding-top:12px;font-size:11px;color:#666}
+  @media print{body{background:#fff}.sheet{width:100%;max-width:none;margin:0;box-shadow:none;padding:15px}@page{size:A4;margin:8mm}}
+  </style></head><body><div class="sheet">
+  <div class="head"><div class="brand"><img src="${BILL_LOGO}"><div><h1>KMP DAIRY PRODUCTS</h1><p>${esc(data.settings.farm||'KMP Dairy Farms')}<br>${esc(data.settings.location||'')}</p></div></div>
+  <div class="meta"><p><b>INVOICE</b></p><p>No: <b>${esc(x.invoiceNo)}</b></p><p>Date: ${esc(x.date)}</p><p>Payment: ${esc(x.paymentMode)}</p></div></div>
+  <div class="customer"><b>Bill To: ${esc(x.customerName||'Walk-in Customer')}</b><br>${esc(x.customerPhone||'')}<br>${esc(x.customerAddress||'')}</div>
+  <table><thead><tr><th>#</th><th>Product / Service</th><th>Unit</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>${rows}</tbody></table>
+  <div class="totals"><div class="tr"><span>Subtotal</span><b>₹ ${subtotal.toLocaleString('en-IN',{maximumFractionDigits:2})}</b></div><div class="tr"><span>Discount</span><b>₹ ${discount.toLocaleString('en-IN',{maximumFractionDigits:2})}</b></div><div class="tr"><span>Tax (${Number(x.taxRate||0)}%)</span><b>₹ ${tax.toLocaleString('en-IN',{maximumFractionDigits:2})}</b></div><div class="tr grand"><span>Grand Total</span><b>₹ ${grand.toLocaleString('en-IN',{maximumFractionDigits:2})}</b></div><div class="tr"><span>Paid</span><b>₹ ${Number(x.paid||0).toLocaleString('en-IN',{maximumFractionDigits:2})}</b></div><div class="tr balance"><span>Balance</span><b>₹ ${balance.toLocaleString('en-IN',{maximumFractionDigits:2})}</b></div></div>
+  <div class="foot">${esc(x.notes||'Thank you for your business.')}<br><br>Generated by KMP Dairy Farms — Billing</div></div><script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.close();
+}
 
 function openCow(id=''){
  if(!id && data.cows.length>=MAX_RECORDS){toast('Cow Management capacity reached: '+MAX_RECORDS.toLocaleString());return;}
@@ -1160,6 +1493,14 @@ add('Hello — I’m your Farm Assistant. I read the live records already in thi
 <script>
 /* Language picker is added after the assistant so both text and voice can use it. */
 (function(){const voice=document.getElementById('assistantVoice');if(!voice)return;const select=document.createElement('select');select.id='assistantLang';select.title='Voice language';select.setAttribute('aria-label','Voice language');select.innerHTML='<option value="en-IN">EN</option><option value="ta-IN">தமிழ்</option>';voice.before(select);const notice=document.querySelector('.assistant-notice');if(notice)notice.textContent='Ask in English, தமிழ், or Tanglish. For voice input, choose EN or தமிழ் first.'})()
+</script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  themeInit();
+  updateBillingSortButton();
+  if($('billingSort'))$('billingSort').value=localStorage.getItem('kmpBillingSort')||'date-desc';
+  if($('billingSort'))$('billingSort').addEventListener('change',()=>localStorage.setItem('kmpBillingSort',$('billingSort').value));
+});
 </script>
 </body>
 </html>
